@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install)",
+      "Bash(pnpm db:seed)",
+      "Bash(pnpm db:generate)",
+      "Bash(pnpm dev)",
+      "Bash(curl:*)",
+      "Bash(rm:*)",
+      "Bash(mkdir:*)",
+      "Bash(test:*)"
+    ]
+  }
+}
