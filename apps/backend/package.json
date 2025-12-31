@@ -12,7 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "@repo/database": "workspace:*",
+    "@repo/dto": "workspace:*",
+    "@repo/shared": "workspace:*",
     "@repo/types": "workspace:*",
+    "@repo/validation": "workspace:*",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",

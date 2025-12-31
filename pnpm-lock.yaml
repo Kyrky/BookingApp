@@ -23,9 +23,18 @@ importers:
       '@repo/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@repo/dto':
+        specifier: workspace:*
+        version: link:../../packages/dto
+      '@repo/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@repo/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@repo/validation':
+        specifier: workspace:*
+        version: link:../../packages/validation
       cors:
         specifier: ^2.8.5
         version: 2.8.5
@@ -135,6 +144,19 @@ importers:
         specifier: latest
         version: 5.9.3
 
+  packages/dto:
+    dependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+    devDependencies:
+      '@types/node':
+        specifier: latest
+        version: 25.0.3
+      typescript:
+        specifier: latest
+        version: 5.9.3
+
   packages/eslint-config:
     devDependencies:
       '@eslint/js':
@@ -170,6 +192,19 @@ importers:
       typescript-eslint:
         specifier: ^8.50.0
         version: 8.50.0(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.2)
+
+  packages/shared:
+    dependencies:
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+    devDependencies:
+      '@types/node':
+        specifier: latest
+        version: 25.0.3
+      typescript:
+        specifier: latest
+        version: 5.9.3
 
   packages/types:
     dependencies:
@@ -209,6 +244,25 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
+
+  packages/validation:
+    dependencies:
+      '@repo/dto':
+        specifier: workspace:*
+        version: link:../dto
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      zod:
+        specifier: ^4.2.1
+        version: 4.3.2
+    devDependencies:
+      '@types/node':
+        specifier: latest
+        version: 25.0.3
+      typescript:
+        specifier: latest
+        version: 5.9.3
 
 packages:
 
@@ -826,6 +880,9 @@ packages:
 
   '@types/node@24.10.4':
     resolution: {integrity: sha512-vnDVpYPMzs4wunl27jHrfmwojOGKya0xyM3sH+UE5iv5uPS6vX7UIoh6m+vQc5LGBq52HBKPIn/zcSZVzeDEZg==}
+
+  '@types/node@25.0.3':
+    resolution: {integrity: sha512-W609buLVRVmeW693xKfzHeIV6nJGGz98uCPfeXI1ELMLXVeKYZ9m15fAMSaUPBHYLGFsVRcMmSCksQOrZV9BYA==}
 
   '@types/qs@6.14.0':
     resolution: {integrity: sha512-eOunJqu0K1923aExK6y8p6fsihYEn/BYuQ4g0CxAAgFc4b/ZLN4CrsRZ55srTdqoiLzU2B2evC+apEIxprEzkQ==}
@@ -2846,6 +2903,9 @@ packages:
   zod@4.2.1:
     resolution: {integrity: sha512-0wZ1IRqGGhMP76gLqz8EyfBXKk0J2qo2+H3fi4mcUP/KtTocoX08nmIAHl1Z2kJIZbZee8KOpBCSNPRgauucjw==}
 
+  zod@4.3.2:
+    resolution: {integrity: sha512-b8L8yn4rIVfiXyHAmnr52/ZEpDumlT0bmxiq3Ws1ybrinhflGpt12Hvv54kYnEsGPRs6o/Ka3/ppA2OWY21IVg==}
+
 snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
@@ -3456,6 +3516,10 @@ snapshots:
       undici-types: 6.21.0
 
   '@types/node@24.10.4':
+    dependencies:
+      undici-types: 7.16.0
+
+  '@types/node@25.0.3':
     dependencies:
       undici-types: 7.16.0
 
@@ -4242,8 +4306,8 @@ snapshots:
       '@babel/parser': 7.28.5
       eslint: 9.39.1(jiti@2.6.1)
       hermes-parser: 0.25.1
-      zod: 4.2.1
-      zod-validation-error: 4.0.2(zod@4.2.1)
+      zod: 4.3.2
+      zod-validation-error: 4.0.2(zod@4.3.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -5767,8 +5831,10 @@ snapshots:
     dependencies:
       grammex: 3.1.12
 
-  zod-validation-error@4.0.2(zod@4.2.1):
+  zod-validation-error@4.0.2(zod@4.3.2):
     dependencies:
-      zod: 4.2.1
+      zod: 4.3.2
 
   zod@4.2.1: {}
+
+  zod@4.3.2: {}

@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id         String     @id @default(uuid())
+  email      String     @unique
+  name       String?
+  password   String     // Обязательно для Auth
+  properties Property[] // Жилье, которым владеет юзер
+  bookings   Booking[]  // Бронирования юзера
+  createdAt  DateTime   @default(now())
+}
+
+model Property {
+  id            String    @id @default(uuid())
+  title         String
+  description   String    @db.Text
+  pricePerNight Float
+  address       String
+  imageUrl      String?
+  ownerId       String
+  owner         User      @relation(fields: [ownerId], references: [id])
+  bookings      Booking[]
+  createdAt     DateTime  @default(now())
+}
+
+model Booking {
+  id         String   @id @default(uuid())
+  startDate  DateTime
+  endDate    DateTime
+  totalPrice Float
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id])
+  createdAt  DateTime @default(now())
+}

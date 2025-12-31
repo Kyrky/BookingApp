@@ -1,0 +1,9 @@
+{
+  "extends": "@repo/typescript-config/base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "module": "CommonJS", 
+    "moduleResolution": "node"
+  },
+  "include": ["src", "prisma.config.ts"] 
+}

@@ -1,0 +1,6 @@
+export enum PropertyStatus {
+  AVAILABLE = "AVAILABLE",
+  RENTED = "RENTED",
+  MAINTENANCE = "MAINTENANCE",
+  INACTIVE = "INACTIVE",
+}
