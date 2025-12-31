@@ -1,8 +1,7 @@
-import { PropertyRepository } from "../domain/property.repository";
-import { Property } from "@repo/database";
+import { IPropertyRepository, Property } from "@repo/shared";
 
 export class GetPropertiesUseCase {
-  constructor(private propertyRepository: PropertyRepository) {}
+  constructor(private propertyRepository: IPropertyRepository) {}
 
   async execute(): Promise<Property[]> {
     return await this.propertyRepository.findAll();

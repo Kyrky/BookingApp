@@ -1,9 +1,16 @@
-import { PropertyRepository } from "../domain/property.repository";
+import { IPropertyRepository, Property } from "@repo/shared";
+import { PropertyNotFoundError } from "@repo/shared";
 
 export class GetPropertyByIdUseCase {
-  constructor(private propertyRepository: PropertyRepository) {}
+  constructor(private propertyRepository: IPropertyRepository) {}
 
-  async execute(id: string) {
-    return await this.propertyRepository.findById(id);
+  async execute(id: string): Promise<Property> {
+    const property = await this.propertyRepository.findById(id);
+
+    if (!property) {
+      throw new PropertyNotFoundError(id);
+    }
+
+    return property;
   }
 }
