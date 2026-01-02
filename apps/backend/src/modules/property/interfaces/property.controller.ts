@@ -5,6 +5,7 @@ import { CreatePropertyUseCase } from "../application/create-property.use-case";
 import { UpdatePropertyUseCase } from "../application/update-property.use-case";
 import { DeletePropertyUseCase } from "../application/delete-property.use-case";
 import { toPropertyResponseDto, toPropertyListResponseDto } from "../mappers/property-response.mapper";
+import { deleteImageFile } from "../../../utils/file.utils";
 
 export class PropertyController {
   constructor(
@@ -74,6 +75,8 @@ export class PropertyController {
     let imageUrl = req.body.imageUrl;
 
     if (file) {
+      const existingProperty = await this.getPropertyByIdUseCase.execute(id);
+      deleteImageFile(existingProperty.getImageUrl());
       imageUrl = `/uploads/${file.filename}`;
     }
 
@@ -106,6 +109,8 @@ export class PropertyController {
       res.status(400).json({ success: false, error: "Property ID is required" });
       return;
     }
+    const property = await this.getPropertyByIdUseCase.execute(id);
+    deleteImageFile(property.getImageUrl());
     await this.deletePropertyUseCase.execute(id);
     res.status(200).json({
       success: true,
