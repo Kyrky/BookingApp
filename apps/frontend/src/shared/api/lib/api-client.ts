@@ -69,11 +69,61 @@ class ApiClient {
     });
   }
 
+  async postForm<T>(endpoint: string, formData: FormData): Promise<T> {
+    const url = `${this.baseUrl}${endpoint}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      body: formData,
+    });
+
+    const data: ApiResponse<T> = await response.json();
+
+    if (!response.ok) {
+      throw new ApiError(
+        data.error || "Request failed",
+        response.status,
+        data.details
+      );
+    }
+
+    if (!data.success || !data.data) {
+      throw new ApiError("Invalid response format", response.status);
+    }
+
+    return data.data;
+  }
+
   async put<T>(endpoint: string, body: unknown): Promise<T> {
     return this.request<T>(endpoint, {
       method: "PUT",
       body: JSON.stringify(body),
     });
+  }
+
+  async putForm<T>(endpoint: string, formData: FormData): Promise<T> {
+    const url = `${this.baseUrl}${endpoint}`;
+
+    const response = await fetch(url, {
+      method: "PUT",
+      body: formData,
+    });
+
+    const data: ApiResponse<T> = await response.json();
+
+    if (!response.ok) {
+      throw new ApiError(
+        data.error || "Request failed",
+        response.status,
+        data.details
+      );
+    }
+
+    if (!data.success || !data.data) {
+      throw new ApiError("Invalid response format", response.status);
+    }
+
+    return data.data;
   }
 
   async delete<T>(endpoint: string): Promise<T> {

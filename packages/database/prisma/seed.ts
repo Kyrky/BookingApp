@@ -1,6 +1,26 @@
-import { PrismaClient } from '@repo/database';
+import { PrismaClient } from '@prisma/client';
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
+import * as dotenv from 'dotenv';
+import path from 'path';
 
-const prisma = new PrismaClient();
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
+const DATABASE_URL = process.env.DATABASE_URL!;
+const url = new URL(DATABASE_URL);
+
+const adapter = new PrismaMariaDb({
+  host: url.hostname,
+  port: parseInt(url.port) || 3306,
+  user: url.username,
+  password: url.password,
+  database: url.pathname.slice(1),
+  allowPublicKeyRetrieval: true,
+});
+
+const prisma = new PrismaClient({
+  log: ["query"],
+  adapter,
+});
 
 async function main() {
   await prisma.user.createMany({

@@ -39,7 +39,22 @@ export class PropertyController {
   }
 
   async createProperty(req: Request, res: Response): Promise<void> {
-    const input = req.body;
+    const file = req.file as Express.Multer.File;
+    let imageUrl = null;
+
+    if (file) {
+      imageUrl = `/uploads/${file.filename}`;
+    }
+
+    const input = {
+      title: req.body.title,
+      description: req.body.description,
+      pricePerNight: Number(req.body.pricePerNight),
+      address: req.body.address,
+      ownerId: req.body.ownerId,
+      imageUrl,
+    };
+
     const property = await this.createPropertyUseCase.execute(input);
     const response = toPropertyResponseDto(property);
     res.status(201).json({
@@ -54,7 +69,29 @@ export class PropertyController {
       res.status(400).json({ success: false, error: "Property ID is required" });
       return;
     }
-    const input = req.body;
+
+    const file = req.file as Express.Multer.File;
+    let imageUrl = req.body.imageUrl;
+
+    if (file) {
+      imageUrl = `/uploads/${file.filename}`;
+    }
+
+    const input: Record<string, unknown> = {
+      title: req.body.title,
+      description: req.body.description,
+      pricePerNight: req.body.pricePerNight ? Number(req.body.pricePerNight) : undefined,
+      address: req.body.address,
+      ownerId: req.body.ownerId,
+      imageUrl,
+    };
+
+    Object.keys(input).forEach(key => {
+      if (input[key] === undefined) {
+        delete input[key];
+      }
+    });
+
     const property = await this.updatePropertyUseCase.execute(id, input);
     const response = toPropertyResponseDto(property);
     res.status(200).json({
@@ -72,7 +109,7 @@ export class PropertyController {
     await this.deletePropertyUseCase.execute(id);
     res.status(200).json({
       success: true,
-      message: "Property deleted successfully",
+      data: { message: "Property deleted successfully" },
     });
   }
 }

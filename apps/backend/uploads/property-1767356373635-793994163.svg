@@ -1,0 +1,252 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000" style="background: #f8f9fa;">
+  <defs>
+    <style>
+      .table { fill: #ffffff; stroke: #1e3c72; stroke-width: 2; }
+      .table-header { fill: #1e3c72; stroke: #1e3c72; stroke-width: 2; }
+      .field { fill: #f8f9fa; stroke: #dee2e6; stroke-width: 1; }
+      .text { font-family: 'Courier New', monospace; font-size: 13px; fill: #333; }
+      .text-white { font-family: 'Courier New', monospace; font-size: 14px; fill: white; font-weight: 600; }
+      .text-small { font-family: 'Courier New', monospace; font-size: 11px; fill: #666; }
+      .pk { fill: #ffeaa7; }
+      .fk { fill: #dfe6e9; }
+      .relationship { stroke: #0066cc; stroke-width: 2; fill: none; }
+      .rel-label { font-family: Arial, sans-serif; font-size: 11px; fill: #0066cc; font-weight: 600; }
+    </style>
+  </defs>
+
+  <!-- Title -->
+  <rect x="0" y="0" width="1400" height="50" fill="#1e3c72"/>
+  <text x="700" y="32" text-anchor="middle" style="font-family: Arial; font-size: 20px; fill: white; font-weight: 600;">StreamPulse IAM - Database Schema (MySQL)</text>
+
+  <!-- Users Table -->
+  <g id="users-table">
+    <rect x="50" y="80" width="300" height="40" class="table-header" rx="4"/>
+    <text x="200" y="105" text-anchor="middle" class="text-white">Users</text>
+    
+    <rect x="50" y="120" width="300" height="25" class="field pk"/>
+    <text x="60" y="137" class="text">🔑 Id: Guid (PK)</text>
+    
+    <rect x="50" y="145" width="300" height="25" class="field"/>
+    <text x="60" y="162" class="text">Email: string(255) UNIQUE</text>
+    
+    <rect x="50" y="170" width="300" height="25" class="field"/>
+    <text x="60" y="187" class="text">PasswordHash: string(255)</text>
+    
+    <rect x="50" y="195" width="300" height="25" class="field"/>
+    <text x="60" y="212" class="text">EmailConfirmed: bool</text>
+    
+    <rect x="50" y="220" width="300" height="25" class="field"/>
+    <text x="60" y="237" class="text">EmailConfirmationToken: string?</text>
+    
+    <rect x="50" y="245" width="300" height="25" class="field"/>
+    <text x="60" y="262" class="text">IsActive: bool</text>
+    
+    <rect x="50" y="270" width="300" height="25" class="field"/>
+    <text x="60" y="287" class="text">CreatedAt, UpdatedAt: DateTime</text>
+  </g>
+
+  <!-- Roles Table -->
+  <g id="roles-table">
+    <rect x="550" y="80" width="300" height="40" class="table-header" rx="4"/>
+    <text x="700" y="105" text-anchor="middle" class="text-white">Roles</text>
+    
+    <rect x="550" y="120" width="300" height="25" class="field pk"/>
+    <text x="560" y="137" class="text">🔑 Id: Guid (PK)</text>
+    
+    <rect x="550" y="145" width="300" height="25" class="field"/>
+    <text x="560" y="162" class="text">Name: string(100) UNIQUE</text>
+    
+    <rect x="550" y="170" width="300" height="25" class="field"/>
+    <text x="560" y="187" class="text">Description: string(500)?</text>
+    
+    <rect x="550" y="195" width="300" height="25" class="field"/>
+    <text x="560" y="212" class="text">IsActive: bool</text>
+    
+    <rect x="550" y="220" width="300" height="25" class="field"/>
+    <text x="560" y="237" class="text">CreatedAt, UpdatedAt: DateTime</text>
+  </g>
+
+  <!-- RoleBindings Table -->
+  <g id="rolebindings-table">
+    <rect x="250" y="350" width="350" height="40" class="table-header" rx="4"/>
+    <text x="425" y="375" text-anchor="middle" class="text-white">RoleBindings (User ↔ Role)</text>
+    
+    <rect x="250" y="390" width="350" height="25" class="field pk"/>
+    <text x="260" y="407" class="text">🔑 Id: Guid (PK)</text>
+    
+    <rect x="250" y="415" width="350" height="25" class="field fk"/>
+    <text x="260" y="432" class="text">🔗 UserId: Guid (FK → Users.Id)</text>
+    
+    <rect x="250" y="440" width="350" height="25" class="field fk"/>
+    <text x="260" y="457" class="text">🔗 RoleId: Guid (FK → Roles.Id)</text>
+    
+    <rect x="250" y="465" width="350" height="25" class="field"/>
+    <text x="260" y="482" class="text">AssignedAt: DateTime</text>
+    
+    <rect x="250" y="490" width="350" height="25" class="field"/>
+    <text x="260" y="507" class="text">ExpiresAt: DateTime? (optional)</text>
+  </g>
+
+  <!-- Permissions Table -->
+  <g id="permissions-table">
+    <rect x="1050" y="80" width="300" height="40" class="table-header" rx="4"/>
+    <text x="1200" y="105" text-anchor="middle" class="text-white">Permissions</text>
+    
+    <rect x="1050" y="120" width="300" height="25" class="field pk"/>
+    <text x="1060" y="137" class="text">🔑 Id: Guid (PK)</text>
+    
+    <rect x="1050" y="145" width="300" height="25" class="field"/>
+    <text x="1060" y="162" class="text">Name: string(100) UNIQUE</text>
+    
+    <rect x="1050" y="170" width="300" height="25" class="field"/>
+    <text x="1060" y="187" class="text">Description: string(500)?</text>
+    
+    <rect x="1050" y="195" width="300" height="25" class="field"/>
+    <text x="1060" y="212" class="text">Resource: string(50)</text>
+    
+    <rect x="1050" y="220" width="300" height="25" class="field"/>
+    <text x="1060" y="237" class="text">Action: string(50)</text>
+    
+    <rect x="1050" y="245" width="300" height="25" class="field"/>
+    <text x="1060" y="262" class="text">CreatedAt: DateTime</text>
+  </g>
+
+  <!-- RolePermissions Table -->
+  <g id="rolepermissions-table">
+    <rect x="750" y="350" width="380" height="40" class="table-header" rx="4"/>
+    <text x="940" y="375" text-anchor="middle" class="text-white">RolePermissions (Role ↔ Permission)</text>
+    
+    <rect x="750" y="390" width="380" height="25" class="field pk"/>
+    <text x="760" y="407" class="text">🔑 Id: Guid (PK)</text>
+    
+    <rect x="750" y="415" width="380" height="25" class="field fk"/>
+    <text x="760" y="432" class="text">🔗 RoleId: Guid (FK → Roles.Id)</text>
+    
+    <rect x="750" y="440" width="380" height="25" class="field fk"/>
+    <text x="760" y="457" class="text">🔗 PermissionId: Guid (FK → Permissions.Id)</text>
+  </g>
+
+  <!-- RefreshTokens Table -->
+  <g id="refreshtokens-table">
+    <rect x="50" y="580" width="320" height="40" class="table-header" rx="4"/>
+    <text x="210" y="605" text-anchor="middle" class="text-white">RefreshTokens</text>
+    
+    <rect x="50" y="620" width="320" height="25" class="field pk"/>
+    <text x="60" y="637" class="text">🔑 Id: Guid (PK)</text>
+    
+    <rect x="50" y="645" width="320" height="25" class="field fk"/>
+    <text x="60" y="662" class="text">🔗 UserId: Guid (FK → Users.Id)</text>
+    
+    <rect x="50" y="670" width="320" height="25" class="field"/>
+    <text x="60" y="687" class="text">Token: string(255) UNIQUE</text>
+    
+    <rect x="50" y="695" width="320" height="25" class="field"/>
+    <text x="60" y="712" class="text">ExpiresAt: DateTime</text>
+    
+    <rect x="50" y="720" width="320" height="25" class="field"/>
+    <text x="60" y="737" class="text">CreatedAt, RevokedAt: DateTime?</text>
+    
+    <rect x="50" y="745" width="320" height="25" class="field"/>
+    <text x="60" y="762" class="text">DeviceInfo: string(500)?</text>
+  </g>
+
+  <!-- OAuthClients Table -->
+  <g id="oauthclients-table">
+    <rect x="450" y="580" width="340" height="40" class="table-header" rx="4"/>
+    <text x="620" y="605" text-anchor="middle" class="text-white">OAuthClients</text>
+    
+    <rect x="450" y="620" width="340" height="25" class="field pk"/>
+    <text x="460" y="637" class="text">🔑 Id: Guid (PK)</text>
+    
+    <rect x="450" y="645" width="340" height="25" class="field"/>
+    <text x="460" y="662" class="text">ClientId: string(100) UNIQUE</text>
+    
+    <rect x="450" y="670" width="340" height="25" class="field"/>
+    <text x="460" y="687" class="text">ClientSecret: string(255)? (hashed)</text>
+    
+    <rect x="450" y="695" width="340" height="25" class="field"/>
+    <text x="460" y="712" class="text">ClientName: string(200)</text>
+    
+    <rect x="450" y="720" width="340" height="25" class="field"/>
+    <text x="460" y="737" class="text">RedirectUris: string[] (JSON)</text>
+    
+    <rect x="450" y="745" width="340" height="25" class="field"/>
+    <text x="460" y="762" class="text">RequirePkce, IsActive: bool</text>
+  </g>
+
+  <!-- AuthorizationCodes Table -->
+  <g id="authcodes-table">
+    <rect x="850" y="580" width="400" height="40" class="table-header" rx="4"/>
+    <text x="1050" y="605" text-anchor="middle" class="text-white">AuthorizationCodes</text>
+    
+    <rect x="850" y="620" width="400" height="25" class="field pk"/>
+    <text x="860" y="637" class="text">🔑 Id: Guid (PK)</text>
+    
+    <rect x="850" y="645" width="400" height="25" class="field fk"/>
+    <text x="860" y="662" class="text">🔗 ClientId: Guid (FK → OAuthClients.Id)</text>
+    
+    <rect x="850" y="670" width="400" height="25" class="field fk"/>
+    <text x="860" y="687" class="text">🔗 UserId: Guid (FK → Users.Id)</text>
+    
+    <rect x="850" y="695" width="400" height="25" class="field"/>
+    <text x="860" y="712" class="text">Code: string(100) UNIQUE</text>
+    
+    <rect x="850" y="720" width="400" height="25" class="field"/>
+    <text x="860" y="737" class="text">CodeChallenge, CodeChallengeMethod</text>
+    
+    <rect x="850" y="745" width="400" height="25" class="field"/>
+    <text x="860" y="762" class="text">ExpiresAt: DateTime, IsUsed: bool</text>
+  </g>
+
+  <!-- Relationships -->
+  <!-- Users to RoleBindings (1:N) -->
+  <path d="M 200 295 L 200 320 L 320 320 L 320 390" class="relationship"/>
+  <text x="210" y="315" class="rel-label">1</text>
+  <text x="325" y="385" class="rel-label">N</text>
+
+  <!-- Roles to RoleBindings (1:N) -->
+  <path d="M 700 245 L 700 320 L 520 320 L 520 390" class="relationship"/>
+  <text x="705" y="260" class="rel-label">1</text>
+  <text x="525" y="385" class="rel-label">N</text>
+
+  <!-- Roles to RolePermissions (1:N) -->
+  <path d="M 700 245 L 700 280 L 840 280 L 840 390" class="relationship"/>
+  <text x="705" y="260" class="rel-label">1</text>
+  <text x="845" y="385" class="rel-label">N</text>
+
+  <!-- Permissions to RolePermissions (1:N) -->
+  <path d="M 1200 270 L 1200 310 L 1040 310 L 1040 390" class="relationship"/>
+  <text x="1205" y="285" class="rel-label">1</text>
+  <text x="1045" y="385" class="rel-label">N</text>
+
+  <!-- Users to RefreshTokens (1:N) -->
+  <path d="M 150 295 L 150 550 L 150 620" class="relationship"/>
+  <text x="155" y="310" class="rel-label">1</text>
+  <text x="155" y="615" class="rel-label">N</text>
+
+  <!-- Users to AuthorizationCodes (1:N) -->
+  <path d="M 250 295 L 250 550 L 900 550 L 900 620" class="relationship"/>
+  <text x="255" y="310" class="rel-label">1</text>
+  <text x="905" y="615" class="rel-label">N</text>
+
+  <!-- OAuthClients to AuthorizationCodes (1:N) -->
+  <path d="M 790 680 L 850 680" class="relationship"/>
+  <text x="795" y="675" class="rel-label">1</text>
+  <text x="845" y="675" class="rel-label">N</text>
+
+  <!-- Legend -->
+  <rect x="50" y="900" width="1300" height="80" fill="white" stroke="#1e3c72" stroke-width="2" rx="8"/>
+  <text x="70" y="925" style="font-family: Arial; font-size: 14px; font-weight: 600; fill: #1e3c72;">Легенда:</text>
+  
+  <rect x="70" y="935" width="100" height="25" class="pk"/>
+  <text x="75" y="952" class="text">🔑 PK = Primary Key</text>
+  
+  <rect x="200" y="935" width="130" height="25" class="fk"/>
+  <text x="205" y="952" class="text">🔗 FK = Foreign Key</text>
+  
+  <text x="370" y="952" style="font-family: Arial; font-size: 13px; fill: #0066cc;">━━ = Связь 1:N (один-ко-многим)</text>
+  
+  <text x="650" y="952" style="font-family: Arial; font-size: 13px; fill: #666;">• Все таблицы используют Guid как PK</text>
+  
+  <text x="1000" y="952" style="font-family: Arial; font-size: 13px; fill: #666;">• Индексы на FK и уникальных полях</text>
+</svg>

@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
 import propertyRoutes from "./modules/property/interfaces/property.routes";
 import { errorHandler } from "./middleware/error.middleware";
 
@@ -12,6 +13,7 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Routes
 app.use("/api/properties", propertyRoutes);
