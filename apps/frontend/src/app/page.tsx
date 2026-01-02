@@ -112,29 +112,37 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Properties</h1>
-          <div className="flex gap-3">
-            <button
-              onClick={handleCleanupImages}
-              className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
-            >
-              Cleanup Images
-            </button>
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Add Property
-            </button>
+        <div className="bg-white border border-slate-200 rounded-lg p-6 mb-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold text-slate-900">Properties Management</h1>
+              <p className="text-sm text-slate-500 mt-1">Manage your property portfolio</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleCleanupImages}
+                className="px-4 py-2 bg-slate-100 text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-200 transition-colors text-sm font-medium"
+              >
+                Cleanup Images
+              </button>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm"
+              >
+                Add Property
+              </button>
+            </div>
           </div>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center gap-2">
+            <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            <span className="text-sm font-medium">{error}</span>
           </div>
         )}
 
@@ -147,9 +155,12 @@ export default function Home() {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-        <h2 className="text-2xl font-bold mb-4">
+        <h2 className="text-xl font-semibold text-slate-900 mb-1">
           {editingProperty ? "Edit Property" : "Add New Property"}
         </h2>
+        <p className="text-sm text-slate-500 mb-6">
+          {editingProperty ? "Update property information below" : "Fill in the details to add a new property"}
+        </p>
         <PropertyForm
           onSubmit={editingProperty ? handleUpdate : handleCreate}
           onCancel={handleCloseModal}
