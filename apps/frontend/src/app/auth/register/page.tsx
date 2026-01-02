@@ -16,8 +16,8 @@ export default function RegisterPage() {
     try {
       const response = await authApi.register({ name, email, password });
 
-      // Store token and user
       authStorage.setToken(response.token);
+      authStorage.setRefreshToken(response.refreshToken);
       authStorage.setUser(response.user);
 
       success("Account created successfully");

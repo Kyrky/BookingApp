@@ -12,6 +12,7 @@ export interface AuthResponse {
     updatedAt: string;
   };
   token: string;
+  refreshToken: string;
 }
 
 export interface LoginRequest {
@@ -23,6 +24,10 @@ export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
+}
+
+export interface RefreshRequest {
+  refreshToken: string;
 }
 
 class AuthApi {
@@ -58,6 +63,22 @@ class AuthApi {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || "Registration failed");
+    }
+
+    const result = await response.json();
+    return result.data;
+  }
+
+  async refresh(data: RefreshRequest): Promise<AuthResponse> {
+    const response = await fetch(`${this.baseUrl}/api/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Token refresh failed");
     }
 
     const result = await response.json();

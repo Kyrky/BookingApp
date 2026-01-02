@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
-import { JwtService, JwtPayload } from "@repo/shared";
+import { randomBytes, createHash } from "crypto";
+import { JwtService, JwtPayload, generateRandomToken, hashToken } from "@repo/shared";
 
 export class JwtServiceImpl implements JwtService {
   private readonly secret = process.env.JWT_SECRET || "your-secret-key-change-in-production";
@@ -16,5 +17,13 @@ export class JwtServiceImpl implements JwtService {
     } catch {
       return null;
     }
+  }
+
+  generateRefreshToken(): string {
+    return generateRandomToken();
+  }
+
+  hashRefreshToken(token: string): string {
+    return hashToken(token);
   }
 }

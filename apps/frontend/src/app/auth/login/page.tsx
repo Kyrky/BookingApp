@@ -16,8 +16,8 @@ export default function LoginPage() {
     try {
       const response = await authApi.login({ email, password });
 
-      // Store token and user
       authStorage.setToken(response.token);
+      authStorage.setRefreshToken(response.refreshToken);
       authStorage.setUser(response.user);
 
       success("Login successful");

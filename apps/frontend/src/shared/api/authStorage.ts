@@ -1,4 +1,5 @@
 const TOKEN_KEY = "auth_token";
+const REFRESH_TOKEN_KEY = "auth_refresh_token";
 const USER_KEY = "auth_user";
 
 export interface StoredUser {
@@ -26,6 +27,21 @@ export const authStorage = {
     localStorage.removeItem(TOKEN_KEY);
   },
 
+  getRefreshToken(): string | null {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  },
+
+  setRefreshToken(token: string): void {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(REFRESH_TOKEN_KEY, token);
+  },
+
+  removeRefreshToken(): void {
+    if (typeof window === "undefined") return;
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
+  },
+
   getUser(): StoredUser | null {
     if (typeof window === "undefined") return null;
     const user = localStorage.getItem(USER_KEY);
@@ -44,6 +60,7 @@ export const authStorage = {
 
   clear(): void {
     this.removeToken();
+    this.removeRefreshToken();
     this.removeUser();
   },
 };

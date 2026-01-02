@@ -11,8 +11,13 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+export const refreshSchema = z.object({
+  refreshToken: z.string().min(1, "Refresh token is required"),
+});
+
 export type RegisterDto = z.infer<typeof registerSchema>;
 export type LoginDto = z.infer<typeof loginSchema>;
+export type RefreshDto = z.infer<typeof refreshSchema>;
 
 export interface AuthResponseDto {
   user: {
@@ -20,6 +25,9 @@ export interface AuthResponseDto {
     email: string;
     name: string;
     role: string;
+    createdAt: Date;
+    updatedAt: Date;
   };
   token: string;
+  refreshToken: string;
 }

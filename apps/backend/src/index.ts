@@ -10,7 +10,10 @@ import { cleanupOrphanedImages } from "./utils/cleanup.utils";
 import { prisma } from "@repo/database";
 import { RegisterUseCase } from "./modules/auth/application/register.use-case";
 import { LoginUseCase } from "./modules/auth/application/login.use-case";
+import { RefreshUseCase } from "./modules/auth/application/refresh.use-case";
+import { CreateRefreshTokenUseCase } from "./modules/auth/application/create-refresh-token.use-case";
 import { UserRepositoryImpl } from "./modules/auth/infrastructure/user.repository.impl";
+import { RefreshTokenRepositoryImpl } from "./modules/auth/infrastructure/refresh-token.repository.impl";
 import { AuthController } from "./modules/auth/interfaces/auth.controller";
 import { makeAuthRoutes } from "./modules/auth/interfaces/auth.routes";
 import { BcryptAdapterImpl } from "./shared/infrastructure/bcrypt.adapter.impl";
@@ -23,9 +26,12 @@ const PORT = 3001;
 const bcryptAdapter = new BcryptAdapterImpl();
 const jwtService = new JwtServiceImpl();
 const userRepository = new UserRepositoryImpl(prisma);
+const refreshTokenRepository = new RefreshTokenRepositoryImpl(prisma);
 const registerUseCase = new RegisterUseCase(userRepository, bcryptAdapter);
 const loginUseCase = new LoginUseCase(userRepository, bcryptAdapter);
-const authController = new AuthController(registerUseCase, loginUseCase, jwtService);
+const refreshUseCase = new RefreshUseCase(userRepository, refreshTokenRepository, jwtService);
+const createRefreshTokenUseCase = new CreateRefreshTokenUseCase(refreshTokenRepository, jwtService);
+const authController = new AuthController(registerUseCase, loginUseCase, refreshUseCase, createRefreshTokenUseCase, jwtService);
 const authRoutes = makeAuthRoutes(authController);
 
 // Middleware
@@ -72,6 +78,7 @@ app.listen(PORT, () => {
   console.log(`  GET    http://localhost:${PORT}/health`);
   console.log(`  POST   http://localhost:${PORT}/api/auth/register`);
   console.log(`  POST   http://localhost:${PORT}/api/auth/login`);
+  console.log(`  POST   http://localhost:${PORT}/api/auth/refresh`);
   console.log(`  GET    http://localhost:${PORT}/api/properties`);
   console.log(`  GET    http://localhost:${PORT}/api/properties/:id`);
   console.log(`  POST   http://localhost:${PORT}/api/properties`);
