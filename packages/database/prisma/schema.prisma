@@ -6,37 +6,63 @@ datasource db {
   provider = "mysql"
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
 model User {
-  id         String     @id @default(uuid())
-  email      String     @unique
-  name       String?
-  password   String     // Обязательно для Auth
-  properties Property[] // Жилье, которым владеет юзер
-  bookings   Booking[]  // Бронирования юзера
-  createdAt  DateTime   @default(now())
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  properties Property[]
+  bookings   Booking[]
 }
 
 model Property {
-  id            String    @id @default(uuid())
-  title         String
-  description   String    @db.Text
+  id          String          @id @default(uuid())
+  title       String
+  description String          @db.Text
   pricePerNight Float
-  address       String
-  imageUrl      String?
-  ownerId       String
-  owner         User      @relation(fields: [ownerId], references: [id])
-  bookings      Booking[]
-  createdAt     DateTime  @default(now())
+  address     String
+  imageUrl    String?
+  ownerId     String
+  owner       User            @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  bookings    Booking[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([ownerId])
 }
 
 model Booking {
-  id         String   @id @default(uuid())
-  startDate  DateTime
-  endDate    DateTime
-  totalPrice Float
-  userId     String
-  user       User     @relation(fields: [userId], references: [id])
-  propertyId String
-  property   Property @relation(fields: [propertyId], references: [id])
-  createdAt  DateTime @default(now())
+  id          String        @id @default(uuid())
+  propertyId  String
+  userId      String
+  startDate   DateTime
+  endDate     DateTime
+  totalGuests Int           @default(1)
+  totalPrice  Decimal       @db.Decimal(10, 2)
+  status      BookingStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([userId])
+  @@index([status])
 }
