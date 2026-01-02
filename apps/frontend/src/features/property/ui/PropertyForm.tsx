@@ -1,23 +1,52 @@
 "use client";
 
-import { useState } from "react";
-import type { CreatePropertyDto } from "@repo/dto";
+import { useState, useEffect } from "react";
+import type { CreatePropertyDto, PropertyResponseDto } from "@repo/dto";
 
 interface PropertyFormProps {
-  onSubmit: (data: CreatePropertyDto) => Promise<void>;
+  onSubmit: (data: CreatePropertyDto | FormData) => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
+  initialData?: PropertyResponseDto | null;
 }
 
-export function PropertyForm({ onSubmit, onCancel, loading }: PropertyFormProps) {
+export function PropertyForm({ onSubmit, onCancel, loading, initialData }: PropertyFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [pricePerNight, setPricePerNight] = useState("");
   const [address, setAddress] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [ownerId, setOwnerId] = useState("");
+  const [ownerId, setOwnerId] = useState("550e8400-e29b-41d4-a716-446655440001");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (initialData) {
+      setTitle(initialData.title);
+      setDescription(initialData.description);
+      setPricePerNight(String(initialData.pricePerNight));
+      setAddress(initialData.address);
+      setOwnerId(initialData.ownerId);
+      if (initialData.imageUrl) {
+        setImageUrl(initialData.imageUrl);
+        setImagePreview(initialData.imageUrl);
+      }
+    }
+  }, [initialData]);
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -45,16 +74,28 @@ export function PropertyForm({ onSubmit, onCancel, loading }: PropertyFormProps)
       return;
     }
 
-    const data: CreatePropertyDto = {
-      title,
-      description,
-      pricePerNight: Number(pricePerNight),
-      address,
-      imageUrl: imageUrl || null,
-      ownerId,
-    };
+    if (imageFile) {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("pricePerNight", pricePerNight);
+      formData.append("address", address);
+      formData.append("image", imageFile);
+      formData.append("ownerId", ownerId);
 
-    await onSubmit(data);
+      await onSubmit(formData);
+    } else {
+      const data: CreatePropertyDto = {
+        title,
+        description,
+        pricePerNight: Number(pricePerNight),
+        address,
+        imageUrl: imageUrl || null,
+        ownerId,
+      };
+
+      await onSubmit(data);
+    }
   }
 
   return (
@@ -123,15 +164,33 @@ export function PropertyForm({ onSubmit, onCancel, loading }: PropertyFormProps)
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Image URL
+          Image
         </label>
         <input
-          type="url"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          placeholder="https://..."
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
           className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
+        {imagePreview && (
+          <img
+            src={imagePreview}
+            alt="Preview"
+            className="mt-2 max-h-40 rounded-lg"
+          />
+        )}
+        {!imageFile && (
+          <>
+            <input
+              type="url"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="https://..."
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mt-2"
+            />
+            <p className="text-gray-500 text-sm mt-1">Or enter image URL</p>
+          </>
+        )}
       </div>
 
       <div>
