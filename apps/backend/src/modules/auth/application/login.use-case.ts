@@ -8,18 +8,21 @@ export class LoginUseCase {
   ) {}
 
   async execute(dto: LoginDto): Promise<{ user: User; token: string }> {
-    // Find user
+    console.log(`[LOGIN] Finding user: ${dto.email}`);
     const user = await this.userRepository.findByEmail(dto.email);
     if (!user) {
+      console.log(`[LOGIN] User not found: ${dto.email}`);
       throw new Error("Invalid credentials");
     }
 
-    // Verify password
+    console.log(`[LOGIN] Verifying password for: ${dto.email}`);
     const isValid = await this.bcryptAdapter.compare(dto.password, user.password);
     if (!isValid) {
+      console.log(`[LOGIN] Invalid password for: ${dto.email}`);
       throw new Error("Invalid credentials");
     }
 
+    console.log(`[LOGIN] Login successful: ${user.id}`);
     return { user, token: "" }; // Token will be generated in controller
   }
 }

@@ -12,6 +12,9 @@ export class AuthController {
   ) {}
 
   async register(req: Request, res: Response): Promise<void> {
+    const email = req.body.email;
+    console.log(`[AUTH] Registration attempt: ${email}`);
+
     try {
       const { user } = await this.registerUseCase.execute(req.body);
 
@@ -26,8 +29,10 @@ export class AuthController {
         token,
       };
 
+      console.log(`[AUTH] Registration successful: ${email} -> userId: ${user.id}`);
       res.status(201).json({ success: true, data: response });
     } catch (error) {
+      console.error(`[AUTH] Registration failed: ${email} ->`, error instanceof Error ? error.message : error);
       res.status(400).json({
         success: false,
         error: error instanceof Error ? error.message : "Registration failed",
@@ -36,6 +41,9 @@ export class AuthController {
   }
 
   async login(req: Request, res: Response): Promise<void> {
+    const email = req.body.email;
+    console.log(`[AUTH] Login attempt: ${email}`);
+
     try {
       const { user } = await this.loginUseCase.execute(req.body);
 
@@ -50,8 +58,10 @@ export class AuthController {
         token,
       };
 
+      console.log(`[AUTH] Login successful: ${email} -> userId: ${user.id}`);
       res.status(200).json({ success: true, data: response });
     } catch (error) {
+      console.error(`[AUTH] Login failed: ${email} ->`, error instanceof Error ? error.message : error);
       res.status(401).json({
         success: false,
         error: error instanceof Error ? error.message : "Login failed",

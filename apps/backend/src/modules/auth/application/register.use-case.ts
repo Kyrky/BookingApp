@@ -8,16 +8,16 @@ export class RegisterUseCase {
   ) {}
 
   async execute(dto: RegisterDto): Promise<{ user: User; token: string }> {
-    // Check if user already exists
+    console.log(`[REGISTER] Checking if user exists: ${dto.email}`);
     const existingUser = await this.userRepository.findByEmail(dto.email);
     if (existingUser) {
+      console.log(`[REGISTER] User already exists: ${dto.email}`);
       throw new Error("User already exists");
     }
 
-    // Hash password
+    console.log(`[REGISTER] Hashing password for: ${dto.email}`);
     const hashedPassword = await this.bcryptAdapter.hash(dto.password);
 
-    // Create user
     const userData: CreateUserData = {
       email: dto.email,
       password: hashedPassword,
@@ -25,7 +25,9 @@ export class RegisterUseCase {
       role: UserRole.USER,
     };
 
+    console.log(`[REGISTER] Creating user: ${dto.email}`);
     const user = await this.userRepository.create(userData);
+    console.log(`[REGISTER] User created successfully: ${user.id}`);
 
     return { user, token: "" }; // Token will be generated in controller
   }
