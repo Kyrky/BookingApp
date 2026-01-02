@@ -5,6 +5,7 @@ import { CreatePropertyUseCase } from "../application/create-property.use-case";
 import { UpdatePropertyUseCase } from "../application/update-property.use-case";
 import { DeletePropertyUseCase } from "../application/delete-property.use-case";
 import { toPropertyResponseDto, toPropertyListResponseDto } from "../mappers/property-response.mapper";
+import { deleteImageFile } from "../../../utils/file.utils";
 
 export class PropertyController {
   constructor(
@@ -20,7 +21,7 @@ export class PropertyController {
     const response = toPropertyListResponseDto(properties);
     res.status(200).json({
       success: true,
-      ...response,
+      data: response,
     });
   }
 
@@ -39,7 +40,22 @@ export class PropertyController {
   }
 
   async createProperty(req: Request, res: Response): Promise<void> {
-    const input = req.body;
+    const file = req.file as Express.Multer.File;
+    let imageUrl = null;
+
+    if (file) {
+      imageUrl = `/uploads/${file.filename}`;
+    }
+
+    const input = {
+      title: req.body.title,
+      description: req.body.description,
+      pricePerNight: Number(req.body.pricePerNight),
+      address: req.body.address,
+      ownerId: req.body.ownerId,
+      imageUrl,
+    };
+
     const property = await this.createPropertyUseCase.execute(input);
     const response = toPropertyResponseDto(property);
     res.status(201).json({
@@ -54,7 +70,31 @@ export class PropertyController {
       res.status(400).json({ success: false, error: "Property ID is required" });
       return;
     }
-    const input = req.body;
+
+    const file = req.file as Express.Multer.File;
+    let imageUrl = req.body.imageUrl;
+
+    if (file) {
+      const existingProperty = await this.getPropertyByIdUseCase.execute(id);
+      deleteImageFile(existingProperty.getImageUrl());
+      imageUrl = `/uploads/${file.filename}`;
+    }
+
+    const input: Record<string, unknown> = {
+      title: req.body.title,
+      description: req.body.description,
+      pricePerNight: req.body.pricePerNight ? Number(req.body.pricePerNight) : undefined,
+      address: req.body.address,
+      ownerId: req.body.ownerId,
+      imageUrl,
+    };
+
+    Object.keys(input).forEach(key => {
+      if (input[key] === undefined) {
+        delete input[key];
+      }
+    });
+
     const property = await this.updatePropertyUseCase.execute(id, input);
     const response = toPropertyResponseDto(property);
     res.status(200).json({
@@ -69,10 +109,12 @@ export class PropertyController {
       res.status(400).json({ success: false, error: "Property ID is required" });
       return;
     }
+    const property = await this.getPropertyByIdUseCase.execute(id);
+    deleteImageFile(property.getImageUrl());
     await this.deletePropertyUseCase.execute(id);
     res.status(200).json({
       success: true,
-      message: "Property deleted successfully",
+      data: { message: "Property deleted successfully" },
     });
   }
 }

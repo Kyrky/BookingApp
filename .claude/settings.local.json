@@ -10,7 +10,8 @@
       "Bash(mkdir:*)",
       "Bash(test:*)",
       "Bash(pnpm build:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(touch:*)"
     ]
   }
 }
