@@ -20,7 +20,7 @@ export class PropertyController {
     const response = toPropertyListResponseDto(properties);
     res.status(200).json({
       success: true,
-      ...response,
+      data: response,
     });
   }
 
