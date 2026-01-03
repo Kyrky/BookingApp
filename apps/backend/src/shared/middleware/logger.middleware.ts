@@ -1,17 +1,38 @@
 import { Request, Response, NextFunction } from "express";
+import { logger as winstonLogger } from "@repo/shared";
+import { AuthenticatedRequest } from "../utils/logger.util";
+
+const httpLogger = winstonLogger.child({ context: "HTTP" });
 
 export function logger(req: Request, res: Response, next: NextFunction): void {
   const start = Date.now();
 
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  const { method, originalUrl, ip } = req;
+  const userAgent = req.get("user-agent") || "unknown";
 
   res.on("finish", () => {
     const duration = Date.now() - start;
-    const statusColor = res.statusCode >= 500 ? "\x1b[31m" : res.statusCode >= 400 ? "\x1b[33m" : "\x1b[32m";
-    const reset = "\x1b[0m";
-    console.log(
-      `[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${statusColor}${res.statusCode}${reset} ${duration}ms`
-    );
+    const { statusCode } = res;
+
+    const logData: Record<string, unknown> = {
+      method,
+      url: originalUrl,
+      statusCode,
+      duration: `${duration}ms`,
+      ip,
+      userAgent,
+    };
+
+    // Add user info if available (after auth middleware)
+    const authenticatedReq = req as AuthenticatedRequest;
+    if (authenticatedReq.userId) {
+      logData.userId = authenticatedReq.userId;
+    }
+    if (authenticatedReq.userEmail) {
+      logData.userEmail = authenticatedReq.userEmail;
+    }
+
+    httpLogger.http("Request completed", logData);
   });
 
   next();

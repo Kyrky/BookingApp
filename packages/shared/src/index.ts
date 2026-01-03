@@ -15,3 +15,5 @@ export * from "./repositories/user.repository.interface";
 export * from "./repositories/refresh-token.repository.interface";
 export * from "./crypto/bcrypt.adapter";
 export * from "./jwt/jwt.service";
+export * from "./logger/logger.types";
+export * from "./logger/winston.logger";

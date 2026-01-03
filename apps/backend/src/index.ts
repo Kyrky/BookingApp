@@ -12,6 +12,7 @@ import { RegisterUseCase } from "./modules/auth/application/register.use-case";
 import { LoginUseCase } from "./modules/auth/application/login.use-case";
 import { RefreshUseCase } from "./modules/auth/application/refresh.use-case";
 import { CreateRefreshTokenUseCase } from "./modules/auth/application/create-refresh-token.use-case";
+import { GetMeUseCase } from "./modules/auth/application/get-me.use-case";
 import { UserRepositoryImpl } from "./modules/auth/infrastructure/user.repository.impl";
 import { RefreshTokenRepositoryImpl } from "./modules/auth/infrastructure/refresh-token.repository.impl";
 import { AuthController } from "./modules/auth/interfaces/auth.controller";
@@ -31,7 +32,8 @@ const registerUseCase = new RegisterUseCase(userRepository, bcryptAdapter);
 const loginUseCase = new LoginUseCase(userRepository, bcryptAdapter);
 const refreshUseCase = new RefreshUseCase(userRepository, refreshTokenRepository, jwtService);
 const createRefreshTokenUseCase = new CreateRefreshTokenUseCase(refreshTokenRepository, jwtService);
-const authController = new AuthController(registerUseCase, loginUseCase, refreshUseCase, createRefreshTokenUseCase, jwtService);
+const getMeUseCase = new GetMeUseCase(userRepository);
+const authController = new AuthController(registerUseCase, loginUseCase, refreshUseCase, createRefreshTokenUseCase, getMeUseCase, jwtService);
 const authRoutes = makeAuthRoutes(authController);
 
 // Middleware
@@ -79,6 +81,7 @@ app.listen(PORT, () => {
   console.log(`  POST   http://localhost:${PORT}/api/auth/register`);
   console.log(`  POST   http://localhost:${PORT}/api/auth/login`);
   console.log(`  POST   http://localhost:${PORT}/api/auth/refresh`);
+  console.log(`  GET    http://localhost:${PORT}/api/auth/me`);
   console.log(`  GET    http://localhost:${PORT}/api/properties`);
   console.log(`  GET    http://localhost:${PORT}/api/properties/:id`);
   console.log(`  POST   http://localhost:${PORT}/api/properties`);

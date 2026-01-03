@@ -1,4 +1,6 @@
-import { RefreshTokenRepository, JwtService } from "@repo/shared";
+import { RefreshTokenRepository, JwtService, logger } from "@repo/shared";
+
+const authLogger = logger.child({ context: "AUTH" });
 
 export class CreateRefreshTokenUseCase {
   constructor(
@@ -7,7 +9,7 @@ export class CreateRefreshTokenUseCase {
   ) {}
 
   async execute(userId: string): Promise<string> {
-    console.log(`[CREATE_REFRESH] Creating refresh token for user: ${userId}`);
+    authLogger.info("Creating refresh token", { userId });
 
     const plainToken = this.jwtService.generateRefreshToken();
     const hashedToken = this.jwtService.hashRefreshToken(plainToken);
@@ -21,7 +23,7 @@ export class CreateRefreshTokenUseCase {
       expiresAt,
     });
 
-    console.log(`[CREATE_REFRESH] Refresh token created for user: ${userId}`);
+    authLogger.info("Refresh token created", { userId });
     return plainToken;
   }
 }

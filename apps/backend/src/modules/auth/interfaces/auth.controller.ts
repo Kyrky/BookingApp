@@ -3,8 +3,12 @@ import { RegisterUseCase } from "../application/register.use-case";
 import { LoginUseCase } from "../application/login.use-case";
 import { RefreshUseCase } from "../application/refresh.use-case";
 import { CreateRefreshTokenUseCase } from "../application/create-refresh-token.use-case";
-import { JwtService } from "@repo/shared";
+import { GetMeUseCase } from "../application/get-me.use-case";
+import { JwtService, logger } from "@repo/shared";
 import { AuthResponseDto } from "./auth.dto";
+import { loggerWithUser, AuthenticatedRequest } from "../../../shared/utils/logger.util";
+
+const authLogger = logger.child({ context: "AUTH" });
 
 export class AuthController {
   constructor(
@@ -12,12 +16,13 @@ export class AuthController {
     private readonly loginUseCase: LoginUseCase,
     private readonly refreshUseCase: RefreshUseCase,
     private readonly createRefreshTokenUseCase: CreateRefreshTokenUseCase,
+    private readonly getMeUseCase: GetMeUseCase,
     private readonly jwtService: JwtService
   ) {}
 
   async register(req: Request, res: Response): Promise<void> {
+    const log = loggerWithUser(req as AuthenticatedRequest).child({ context: "AUTH" });
     const email = req.body.email;
-    console.log(`[AUTH] Registration attempt: ${email}`);
 
     try {
       const { user } = await this.registerUseCase.execute(req.body);
@@ -36,10 +41,13 @@ export class AuthController {
         refreshToken,
       };
 
-      console.log(`[AUTH] Registration successful: ${email} -> userId: ${user.id}`);
+      log.info("Registration successful", { email, userId: user.id });
       res.status(201).json({ success: true, data: response });
     } catch (error) {
-      console.error(`[AUTH] Registration failed: ${email} ->`, error instanceof Error ? error.message : error);
+      log.error("Registration failed", {
+        email,
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(400).json({
         success: false,
         error: error instanceof Error ? error.message : "Registration failed",
@@ -48,8 +56,8 @@ export class AuthController {
   }
 
   async login(req: Request, res: Response): Promise<void> {
+    const log = loggerWithUser(req as AuthenticatedRequest).child({ context: "AUTH" });
     const email = req.body.email;
-    console.log(`[AUTH] Login attempt: ${email}`);
 
     try {
       const { user } = await this.loginUseCase.execute(req.body);
@@ -68,10 +76,13 @@ export class AuthController {
         refreshToken,
       };
 
-      console.log(`[AUTH] Login successful: ${email} -> userId: ${user.id}`);
+      log.info("Login successful", { email, userId: user.id });
       res.status(200).json({ success: true, data: response });
     } catch (error) {
-      console.error(`[AUTH] Login failed: ${email} ->`, error instanceof Error ? error.message : error);
+      log.error("Login failed", {
+        email,
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(401).json({
         success: false,
         error: error instanceof Error ? error.message : "Login failed",
@@ -80,8 +91,8 @@ export class AuthController {
   }
 
   async refresh(req: Request, res: Response): Promise<void> {
+    const log = loggerWithUser(req as AuthenticatedRequest).child({ context: "AUTH" });
     const { refreshToken } = req.body;
-    console.log(`[AUTH] Refresh token attempt`);
 
     try {
       const { user, accessToken, newRefreshToken } = await this.refreshUseCase.execute(refreshToken);
@@ -92,10 +103,12 @@ export class AuthController {
         refreshToken: newRefreshToken,
       };
 
-      console.log(`[AUTH] Token refreshed successful: ${user.id}`);
+      log.info("Token refreshed successfully", { userId: user.id });
       res.status(200).json({ success: true, data: response });
     } catch (error) {
-      console.error(`[AUTH] Token refresh failed:`, error instanceof Error ? error.message : error);
+      log.error("Token refresh failed", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(401).json({
         success: false,
         error: error instanceof Error ? error.message : "Token refresh failed",
@@ -104,17 +117,27 @@ export class AuthController {
   }
 
   async getMe(req: Request, res: Response): Promise<void> {
+    const log = loggerWithUser(req as AuthenticatedRequest).child({ context: "AUTH" });
     try {
-      const userId = (req as any).userId;
+      const userId = (req as AuthenticatedRequest).userId;
 
-      const response: AuthResponseDto = {
-        user: (req as any).user,
-        token: "",
-        refreshToken: "",
-      };
+      if (!userId) {
+        log.warn("Get me failed - no userId");
+        res.status(401).json({
+          success: false,
+          error: "Unauthorized",
+        });
+        return;
+      }
 
-      res.status(200).json({ success: true, data: response });
+      const user = await this.getMeUseCase.execute(userId);
+
+      log.info("Get me successful", { userId, email: user.email });
+      res.status(200).json({ success: true, data: { user: user.toJSON() } });
     } catch (error) {
+      log.error("Get me failed", {
+        error: error instanceof Error ? error.message : String(error),
+      });
       res.status(401).json({
         success: false,
         error: "Unauthorized",

@@ -1,5 +1,7 @@
-import { UserRepository, BcryptAdapter, User } from "@repo/shared";
+import { UserRepository, BcryptAdapter, User, logger } from "@repo/shared";
 import { LoginDto } from "../interfaces/auth.dto";
+
+const authLogger = logger.child({ context: "AUTH" });
 
 export class LoginUseCase {
   constructor(
@@ -8,21 +10,21 @@ export class LoginUseCase {
   ) {}
 
   async execute(dto: LoginDto): Promise<{ user: User; token: string }> {
-    console.log(`[LOGIN] Finding user: ${dto.email}`);
+    authLogger.info("Login attempt", { email: dto.email });
+
     const user = await this.userRepository.findByEmail(dto.email);
     if (!user) {
-      console.log(`[LOGIN] User not found: ${dto.email}`);
+      authLogger.warn("Login failed - user not found", { email: dto.email });
       throw new Error("Invalid credentials");
     }
 
-    console.log(`[LOGIN] Verifying password for: ${dto.email}`);
     const isValid = await this.bcryptAdapter.compare(dto.password, user.password);
     if (!isValid) {
-      console.log(`[LOGIN] Invalid password for: ${dto.email}`);
+      authLogger.warn("Login failed - invalid password", { email: dto.email, userId: user.id });
       throw new Error("Invalid credentials");
     }
 
-    console.log(`[LOGIN] Login successful: ${user.id}`);
+    authLogger.info("Login successful", { userId: user.id, email: dto.email });
     return { user, token: "" }; // Token will be generated in controller
   }
 }

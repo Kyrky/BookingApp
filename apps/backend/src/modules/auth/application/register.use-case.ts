@@ -1,5 +1,7 @@
-import { UserRepository, BcryptAdapter, UserRole, User, CreateUserData } from "@repo/shared";
+import { UserRepository, BcryptAdapter, UserRole, User, CreateUserData, logger } from "@repo/shared";
 import { RegisterDto } from "../interfaces/auth.dto";
+
+const authLogger = logger.child({ context: "AUTH" });
 
 export class RegisterUseCase {
   constructor(
@@ -8,14 +10,14 @@ export class RegisterUseCase {
   ) {}
 
   async execute(dto: RegisterDto): Promise<{ user: User; token: string }> {
-    console.log(`[REGISTER] Checking if user exists: ${dto.email}`);
+    authLogger.info("Registration attempt", { email: dto.email });
+
     const existingUser = await this.userRepository.findByEmail(dto.email);
     if (existingUser) {
-      console.log(`[REGISTER] User already exists: ${dto.email}`);
+      authLogger.warn("Registration failed - user already exists", { email: dto.email });
       throw new Error("User already exists");
     }
 
-    console.log(`[REGISTER] Hashing password for: ${dto.email}`);
     const hashedPassword = await this.bcryptAdapter.hash(dto.password);
 
     const userData: CreateUserData = {
@@ -25,9 +27,8 @@ export class RegisterUseCase {
       role: UserRole.USER,
     };
 
-    console.log(`[REGISTER] Creating user: ${dto.email}`);
     const user = await this.userRepository.create(userData);
-    console.log(`[REGISTER] User created successfully: ${user.id}`);
+    authLogger.info("User created successfully", { userId: user.id, email: dto.email });
 
     return { user, token: "" }; // Token will be generated in controller
   }
