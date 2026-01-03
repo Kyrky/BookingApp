@@ -11,7 +11,8 @@
       "Bash(test:*)",
       "Bash(pnpm build:*)",
       "Bash(npx tsc:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(npx ts-node:*)"
     ]
   }
 }

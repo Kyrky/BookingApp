@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LoginForm } from "@/features/auth";
 import { useToast } from "@/shared/ui/hooks/useToast";
+import { authApi, authStorage } from "@/shared/api/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,11 +14,12 @@ export default function LoginPage() {
   async function handleSubmit(email: string, password: string) {
     setLoading(true);
     try {
-      // TODO: Implement actual API call
-      // Simulating API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await authApi.login({ email, password });
 
-      // Mock success
+      authStorage.setToken(response.token);
+      authStorage.setRefreshToken(response.refreshToken);
+      authStorage.setUser(response.user);
+
       success("Login successful");
       setTimeout(() => router.push("/properties"), 500);
     } catch (err) {
