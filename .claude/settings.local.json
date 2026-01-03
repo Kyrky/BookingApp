@@ -12,7 +12,11 @@
       "Bash(pnpm build:*)",
       "Bash(npx tsc:*)",
       "Bash(touch:*)",
-      "Bash(npx ts-node:*)"
+      "Bash(npx ts-node:*)",
+      "Bash(ping:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)"
     ]
   }
 }

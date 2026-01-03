@@ -1,5 +1,7 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
+import { authStorage } from "./authStorage";
+
 export { authStorage } from "./authStorage";
 
 function getAuthHeaders(): Record<string, string> {
