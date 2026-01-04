@@ -39,16 +39,35 @@ class ApiClient {
       },
     };
 
+    console.log(`[API] ${config.method || "GET"} ${url}`);
+
     const response = await fetch(url, config);
 
-    const data: ApiResponse<T> = await response.json();
+    console.log(`[API] Response status: ${response.status}`, response);
 
+    // Check if response is OK before parsing
     if (!response.ok) {
-      throw new ApiError(
-        data.error || "Request failed",
-        response.status,
-        data.details
-      );
+      // Try to get error message from response
+      let errorMessage = `Request failed with status ${response.status}`;
+      try {
+        const text = await response.text();
+        console.error(`[API] Error response:`, text);
+        errorMessage = text || errorMessage;
+      } catch (e) {
+        // Ignore text parse errors
+      }
+      throw new ApiError(errorMessage, response.status);
+    }
+
+    // Parse JSON
+    let data: ApiResponse<T>;
+    try {
+      const text = await response.text();
+      console.log(`[API] Response text:`, text);
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error(`[API] Failed to parse JSON:`, e);
+      throw new ApiError("Invalid JSON response", response.status);
     }
 
     if (!data.success || !data.data) {

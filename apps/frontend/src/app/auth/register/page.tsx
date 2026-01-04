@@ -4,21 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { RegisterForm } from "@/features/auth";
 import { useToast } from "@/shared/ui/hooks/useToast";
-import { authApi, authStorage } from "@/shared/api/auth";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const { success, error: toastError } = useToast();
+  const { registerAction } = useAuth();
 
   async function handleSubmit(name: string, email: string, password: string) {
     setLoading(true);
     try {
-      const response = await authApi.register({ name, email, password });
-
-      authStorage.setToken(response.token);
-      authStorage.setRefreshToken(response.refreshToken);
-      authStorage.setUser(response.user);
+      await registerAction(email, password, name);
 
       success("Account created successfully");
       setTimeout(() => router.push("/properties"), 500);
