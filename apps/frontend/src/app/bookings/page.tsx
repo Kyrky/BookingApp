@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { BookingCalendar, BookingStatusTracker } from "@/entities/booking";
-import { BookingManagement, BookingForm } from "@/features/booking";
+import { BookingManagement, BookingForm, PaymentManagement } from "@/features/booking";
 import { Modal, ToastContainer } from "@/shared/ui";
 import { useToast } from "@/shared/ui/hooks/useToast";
 import { bookingApi } from "@/shared/api";
 import { useAuth } from "@/contexts/auth-context";
 import type { BookingResponseDto, CreateBookingDto, UpdateBookingDto, BookingAvailabilityDto } from "@repo/dto";
 
-type TabType = "list" | "calendar" | "status";
+type TabType = "list" | "payment" | "calendar" | "status";
 type ModalType = "booking" | "view" | null;
 
 export default function BookingsPage() {
@@ -203,6 +203,21 @@ export default function BookingsPage() {
               </div>
             </button>
             <button
+              onClick={() => setActiveTab("payment")}
+              className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
+                activeTab === "payment"
+                  ? "text-orange-600 border-b-2 border-orange-600 bg-orange-50"
+                  : "text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Payment
+              </div>
+            </button>
+            <button
               onClick={() => setActiveTab("calendar")}
               className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
                 activeTab === "calendar"
@@ -255,6 +270,10 @@ export default function BookingsPage() {
             onCheckIn={handleCheckIn}
             onCheckOut={handleCheckOut}
           />
+        )}
+
+        {activeTab === "payment" && (
+          <PaymentManagement bookings={bookings} />
         )}
 
         {activeTab === "calendar" && (
