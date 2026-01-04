@@ -15,7 +15,8 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
-    "@repo/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "@types/node": "latest",

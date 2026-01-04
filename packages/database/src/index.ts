@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
 export * from "@prisma/client";
+export type { PrismaClient };
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
