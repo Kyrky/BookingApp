@@ -49,6 +49,17 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
 
+// Bookings placeholder (TODO: implement full booking module)
+app.get("/api/bookings", (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      bookings: [],
+      total: 0,
+    },
+  });
+});
+
 // Health check
 app.get("/health", (req, res) => {
   res.json({ status: "ok", message: "Backend is running" });
@@ -87,5 +98,6 @@ app.listen(PORT, () => {
   console.log(`  POST   http://localhost:${PORT}/api/properties`);
   console.log(`  PUT    http://localhost:${PORT}/api/properties/:id`);
   console.log(`  DELETE http://localhost:${PORT}/api/properties/:id`);
+  console.log(`  GET    http://localhost:${PORT}/api/bookings (placeholder)`);
   console.log(`  POST   http://localhost:${PORT}/api/cleanup/images`);
 });
