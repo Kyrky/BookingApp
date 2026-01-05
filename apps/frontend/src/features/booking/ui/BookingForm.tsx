@@ -25,14 +25,13 @@ export function BookingForm({
 
   const [formData, setFormData] = useState({
     propertyId: initialData?.propertyId || "",
-    checkIn: initialData?.checkIn
-      ? new Date(initialData.checkIn).toISOString().split("T")[0]
+    startDate: initialData?.startDate
+      ? new Date(initialData.startDate).toISOString().split("T")[0]
       : "",
-    checkOut: initialData?.checkOut
-      ? new Date(initialData.checkOut).toISOString().split("T")[0]
+    endDate: initialData?.endDate
+      ? new Date(initialData.endDate).toISOString().split("T")[0]
       : "",
-    guests: initialData?.guests || 1,
-    specialRequests: initialData?.specialRequests || "",
+    totalGuests: initialData?.totalGuests || 1,
   });
 
   useEffect(() => {
@@ -49,10 +48,10 @@ export function BookingForm({
   }, [formData.propertyId, properties]);
 
   useEffect(() => {
-    if (selectedProperty && formData.checkIn && formData.checkOut) {
-      const checkIn = new Date(formData.checkIn);
-      const checkOut = new Date(formData.checkOut);
-      const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
+    if (selectedProperty && formData.startDate && formData.endDate) {
+      const startDate = new Date(formData.startDate);
+      const endDate = new Date(formData.endDate);
+      const nights = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
       if (nights > 0) {
         setCalculatedPrice({
@@ -65,7 +64,7 @@ export function BookingForm({
     } else {
       setCalculatedPrice(null);
     }
-  }, [selectedProperty, formData.checkIn, formData.checkOut]);
+  }, [selectedProperty, formData.startDate, formData.endDate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,11 +77,10 @@ export function BookingForm({
     const data: CreateBookingDto = {
       propertyId: formData.propertyId,
       userId,
-      checkIn: new Date(formData.checkIn),
-      checkOut: new Date(formData.checkOut),
-      guests: formData.guests,
+      startDate: new Date(formData.startDate),
+      endDate: new Date(formData.endDate),
+      totalGuests: formData.totalGuests,
       totalPrice: calculatedPrice?.totalPrice || 0,
-      specialRequests: formData.specialRequests || undefined,
     };
 
     await onSubmit(data);
@@ -115,32 +113,32 @@ export function BookingForm({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="checkIn" className="block text-sm font-medium text-slate-700 mb-2">
+          <label htmlFor="startDate" className="block text-sm font-medium text-slate-700 mb-2">
             Check-in Date *
           </label>
           <input
-            id="checkIn"
+            id="startDate"
             type="date"
             required
             min={minDate}
-            value={formData.checkIn}
-            onChange={(e) => setFormData({ ...formData, checkIn: e.target.value })}
+            value={formData.startDate}
+            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
             className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
             disabled={loading}
           />
         </div>
 
         <div>
-          <label htmlFor="checkOut" className="block text-sm font-medium text-slate-700 mb-2">
+          <label htmlFor="endDate" className="block text-sm font-medium text-slate-700 mb-2">
             Check-out Date *
           </label>
           <input
-            id="checkOut"
+            id="endDate"
             type="date"
             required
-            min={formData.checkIn || minDate}
-            value={formData.checkOut}
-            onChange={(e) => setFormData({ ...formData, checkOut: e.target.value })}
+            min={formData.startDate || minDate}
+            value={formData.endDate}
+            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
             className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
             disabled={loading}
           />
@@ -148,33 +146,18 @@ export function BookingForm({
       </div>
 
       <div>
-        <label htmlFor="guests" className="block text-sm font-medium text-slate-700 mb-2">
+        <label htmlFor="totalGuests" className="block text-sm font-medium text-slate-700 mb-2">
           Number of Guests *
         </label>
         <input
-          id="guests"
+          id="totalGuests"
           type="number"
           required
           min="1"
           max="20"
-          value={formData.guests}
-          onChange={(e) => setFormData({ ...formData, guests: parseInt(e.target.value) || 1 })}
+          value={formData.totalGuests}
+          onChange={(e) => setFormData({ ...formData, totalGuests: parseInt(e.target.value) || 1 })}
           className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-          disabled={loading}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="specialRequests" className="block text-sm font-medium text-slate-700 mb-2">
-          Special Requests
-        </label>
-        <textarea
-          id="specialRequests"
-          rows={3}
-          value={formData.specialRequests}
-          onChange={(e) => setFormData({ ...formData, specialRequests: e.target.value })}
-          placeholder="Any special requests or notes..."
-          className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none"
           disabled={loading}
         />
       </div>

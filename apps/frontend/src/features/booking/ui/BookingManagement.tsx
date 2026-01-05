@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { BookingResponseDto, BookingStatus, PaymentStatus } from "@repo/dto";
+import { BookingResponseDto, BookingStatus } from "@repo/dto";
 
 interface BookingManagementProps {
   bookings: BookingResponseDto[];
@@ -14,19 +14,11 @@ interface BookingManagementProps {
   onCheckOut?: (id: string) => void;
 }
 
-const statusColors: Record<BookingStatus, { bg: string; text: string; label: string }> = {
+const statusColors: Record<string, { bg: string; text: string; label: string }> = {
   [BookingStatus.PENDING]: { bg: "bg-yellow-100", text: "text-yellow-700", label: "Pending" },
   [BookingStatus.CONFIRMED]: { bg: "bg-blue-100", text: "text-blue-700", label: "Confirmed" },
-  [BookingStatus.CHECKED_IN]: { bg: "bg-green-100", text: "text-green-700", label: "Checked In" },
-  [BookingStatus.CHECKED_OUT]: { bg: "bg-slate-100", text: "text-slate-700", label: "Checked Out" },
+  [BookingStatus.COMPLETED]: { bg: "bg-green-100", text: "text-green-700", label: "Completed" },
   [BookingStatus.CANCELLED]: { bg: "bg-red-100", text: "text-red-700", label: "Cancelled" },
-};
-
-const paymentStatusColors: Record<PaymentStatus, { bg: string; text: string; label: string }> = {
-  [PaymentStatus.PENDING]: { bg: "bg-yellow-100", text: "text-yellow-700", label: "Pending" },
-  [PaymentStatus.COMPLETED]: { bg: "bg-green-100", text: "text-green-700", label: "Completed" },
-  [PaymentStatus.FAILED]: { bg: "bg-red-100", text: "text-red-700", label: "Failed" },
-  [PaymentStatus.REFUNDED]: { bg: "bg-slate-100", text: "text-slate-700", label: "Refunded" },
 };
 
 export function BookingManagement({
@@ -67,10 +59,6 @@ export function BookingManagement({
     if (booking.status === BookingStatus.CONFIRMED) {
       actions.push({ label: "Check In", key: "checkIn", icon: "→", color: "text-blue-600" });
       actions.push({ label: "Cancel", key: "cancel", icon: "✕", color: "text-red-600" });
-    }
-
-    if (booking.status === BookingStatus.CHECKED_IN) {
-      actions.push({ label: "Check Out", key: "checkOut", icon: "←", color: "text-orange-600" });
     }
 
     actions.push({ label: "Edit", key: "edit", icon: "✎", color: "text-slate-600" });
@@ -184,9 +172,6 @@ export function BookingManagement({
                 <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
-                  Payment
-                </th>
                 <th className="px-6 py-3 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">
                   Actions
                 </th>
@@ -213,14 +198,14 @@ export function BookingManagement({
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-slate-900">
-                      {new Date(booking.checkIn).toLocaleDateString()}
+                      {new Date(booking.startDate).toLocaleDateString()}
                     </div>
                     <div className="text-xs text-slate-500">
-                      {new Date(booking.checkOut).toLocaleDateString()}
+                      {new Date(booking.endDate).toLocaleDateString()}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-slate-900">{booking.guests}</span>
+                    <span className="text-sm text-slate-900">{booking.totalGuests}</span>
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-sm font-medium text-slate-900">
@@ -228,22 +213,17 @@ export function BookingManagement({
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        statusColors[booking.status].bg
-                      } ${statusColors[booking.status].text}`}
-                    >
-                      {statusColors[booking.status].label}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        paymentStatusColors[booking.paymentStatus].bg
-                      } ${paymentStatusColors[booking.paymentStatus].text}`}
-                    >
-                      {paymentStatusColors[booking.paymentStatus].label}
-                    </span>
+                    {statusColors[booking.status] ? (
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          statusColors[booking.status].bg
+                        } ${statusColors[booking.status].text}`}
+                      >
+                        {statusColors[booking.status].label}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-slate-400 capitalize">{booking.status.toLowerCase()}</span>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-1">

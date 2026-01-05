@@ -27,14 +27,20 @@ export default function BookingsPage() {
   const { user } = useAuth();
 
   useEffect(() => {
-    loadBookings();
-  }, []);
+    if (user) {
+      loadBookings();
+    }
+  }, [user]);
 
   async function loadBookings() {
+    if (!user) return;
+
     try {
       setLoading(true);
       setError(null);
-      const response = await bookingApi.getAll();
+      const response = user.role === "ADMIN"
+        ? await bookingApi.getAll()
+        : await bookingApi.getMyBookings();
       setBookings(response.bookings);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load bookings");
@@ -161,7 +167,7 @@ export default function BookingsPage() {
     total: bookings.length,
     pending: bookings.filter((b) => b.status === "PENDING").length,
     confirmed: bookings.filter((b) => b.status === "CONFIRMED").length,
-    checkedIn: bookings.filter((b) => b.status === "CHECKED_IN").length,
+    completed: bookings.filter((b) => b.status === "COMPLETED").length,
     cancelled: bookings.filter((b) => b.status === "CANCELLED").length,
   };
 
@@ -173,7 +179,7 @@ export default function BookingsPage() {
             <div>
               <h1 className="text-2xl font-semibold text-slate-900">Bookings Management</h1>
               <p className="text-sm text-slate-500 mt-1">
-                {stats.total} {stats.total === 1 ? "booking" : "bookings"} • {stats.pending} pending • {stats.confirmed} confirmed
+                {stats.total} {stats.total === 1 ? "booking" : "bookings"} • {stats.pending} pending • {stats.confirmed} confirmed • {stats.completed} completed
               </p>
             </div>
             <button
@@ -292,7 +298,7 @@ export default function BookingsPage() {
                 </h3>
                 <div className="space-y-3">
                   {bookings
-                    .filter((b) => b.status !== "CANCELLED" && b.status !== "CHECKED_OUT")
+                    .filter((b) => b.status !== "CANCELLED" && b.status !== "COMPLETED")
                     .slice(0, 5)
                     .map((booking) => (
                       <button
@@ -304,8 +310,8 @@ export default function BookingsPage() {
                           {booking.property?.title}
                         </p>
                         <p className="text-xs text-slate-500">
-                          {new Date(booking.checkIn).toLocaleDateString()} -{" "}
-                          {new Date(booking.checkOut).toLocaleDateString()}
+                          {new Date(booking.startDate).toLocaleDateString()} -{" "}
+                          {new Date(booking.endDate).toLocaleDateString()}
                         </p>
                       </button>
                     ))}

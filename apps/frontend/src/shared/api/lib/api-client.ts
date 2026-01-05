@@ -31,12 +31,22 @@ class ApiClient {
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
+    // Get token from localStorage (using the same key as authStorage)
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...options.headers as Record<string, string>,
+    };
+
+    // Add Authorization header if token exists
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const config: RequestInit = {
       ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
+      headers,
     };
 
     console.log(`[API] ${config.method || "GET"} ${url}`);
@@ -91,8 +101,17 @@ class ApiClient {
   async postForm<T>(endpoint: string, formData: FormData): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
+    // Get token from localStorage (using the same key as authStorage)
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       method: "POST",
+      headers,
       body: formData,
     });
 
@@ -123,8 +142,17 @@ class ApiClient {
   async putForm<T>(endpoint: string, formData: FormData): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
+    // Get token from localStorage (using the same key as authStorage)
+    const token = typeof window !== "undefined" ? localStorage.getItem("auth_token") : null;
+
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       method: "PUT",
+      headers,
       body: formData,
     });
 

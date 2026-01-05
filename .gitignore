@@ -36,3 +36,14 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# Documentation
+BOOKING_SYSTEM_GUIDE.md
+TESTING_TICKETS.md
+
+# Next.js lock files (prevents dev server restart issues)
+apps/frontend/.next/dev/lock
+apps/backend/.next/dev/lock
+
+# Temporary files
+nul

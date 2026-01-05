@@ -1,6 +1,6 @@
 "use client";
 
-import { BookingStatus, PaymentStatus, BookingResponseDto } from "@repo/dto";
+import { BookingStatus, BookingResponseDto } from "@repo/dto";
 
 interface BookingStatusTrackerProps {
   booking: BookingResponseDto;
@@ -10,45 +10,28 @@ interface BookingStatusTrackerProps {
 const statusFlow: BookingStatus[] = [
   BookingStatus.PENDING,
   BookingStatus.CONFIRMED,
-  BookingStatus.CHECKED_IN,
-  BookingStatus.CHECKED_OUT,
+  BookingStatus.COMPLETED,
 ];
 
-const statusLabels: Record<BookingStatus, string> = {
+const statusLabels: Record<string, string> = {
   [BookingStatus.PENDING]: "Pending",
   [BookingStatus.CONFIRMED]: "Confirmed",
-  [BookingStatus.CHECKED_IN]: "Checked In",
-  [BookingStatus.CHECKED_OUT]: "Checked Out",
+  [BookingStatus.COMPLETED]: "Completed",
   [BookingStatus.CANCELLED]: "Cancelled",
 };
 
-const statusDescriptions: Record<BookingStatus, string> = {
+const statusDescriptions: Record<string, string> = {
   [BookingStatus.PENDING]: "Booking request is awaiting confirmation",
-  [BookingStatus.CONFIRMED]: "Booking has been confirmed and payment is processed",
-  [BookingStatus.CHECKED_IN]: "Guest has checked in",
-  [BookingStatus.CHECKED_OUT]: "Guest has checked out",
+  [BookingStatus.CONFIRMED]: "Booking has been confirmed",
+  [BookingStatus.COMPLETED]: "Guest has checked in and booking is completed",
   [BookingStatus.CANCELLED]: "Booking has been cancelled",
 };
 
-const paymentStatusLabels: Record<PaymentStatus, string> = {
-  [PaymentStatus.PENDING]: "Payment Pending",
-  [PaymentStatus.COMPLETED]: "Payment Completed",
-  [PaymentStatus.FAILED]: "Payment Failed",
-  [PaymentStatus.REFUNDED]: "Payment Refunded",
-};
-
-const paymentStatusDescriptions: Record<PaymentStatus, string> = {
-  [PaymentStatus.PENDING]: "Payment is being processed",
-  [PaymentStatus.COMPLETED]: "Payment has been successfully completed",
-  [PaymentStatus.FAILED]: "Payment processing failed",
-  [PaymentStatus.REFUNDED]: "Payment has been refunded",
-};
-
 export function BookingStatusTracker({ booking, onStatusChange }: BookingStatusTrackerProps) {
-  const currentStatusIndex = statusFlow.indexOf(booking.status);
+  const currentStatusIndex = statusFlow.indexOf(booking.status as BookingStatus);
   const isCancelled = booking.status === BookingStatus.CANCELLED;
 
-  const getStatusColor = (status: BookingStatus, currentIndex: number, isActive: boolean) => {
+  const getStatusColor = (status: string, currentIndex: number, isActive: boolean) => {
     if (isCancelled) return "bg-red-100 text-red-700 border-red-200";
 
     if (isActive) {
@@ -132,43 +115,25 @@ export function BookingStatusTracker({ booking, onStatusChange }: BookingStatusT
 
         <div className="mt-6 p-4 bg-slate-50 rounded-lg">
           <p className="text-sm font-medium text-slate-900">
-            Current Status: {statusLabels[booking.status]}
+            Current Status: {statusLabels[booking.status] || booking.status}
           </p>
           <p className="text-xs text-slate-600 mt-1">
-            {statusDescriptions[booking.status]}
+            {statusDescriptions[booking.status] || "Status updated"}
           </p>
         </div>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">Payment Status</h3>
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">Booking Details</h3>
 
-        <div className="flex items-center gap-4">
-          <div
-            className={`px-4 py-2 rounded-full border ${
-              booking.paymentStatus === PaymentStatus.COMPLETED
-                ? "bg-green-100 text-green-700 border-green-200"
-                : booking.paymentStatus === PaymentStatus.FAILED
-                ? "bg-red-100 text-red-700 border-red-200"
-                : booking.paymentStatus === PaymentStatus.REFUNDED
-                ? "bg-slate-100 text-slate-700 border-slate-200"
-                : "bg-yellow-100 text-yellow-700 border-yellow-200"
-            }`}
-          >
-            <span className="font-medium text-sm">
-              {paymentStatusLabels[booking.paymentStatus]}
-            </span>
-          </div>
-        </div>
-
-        <p className="text-xs text-slate-600 mt-3">
-          {paymentStatusDescriptions[booking.paymentStatus]}
-        </p>
-
-        <div className="mt-4 pt-4 border-t border-slate-200">
+        <div className="space-y-3">
           <div className="flex justify-between text-sm">
             <span className="text-slate-600">Total Amount:</span>
             <span className="font-semibold text-slate-900">${booking.totalPrice}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-slate-600">Duration:</span>
+            <span className="font-semibold text-slate-900">{booking.days || 0} nights</span>
           </div>
         </div>
       </div>
@@ -194,7 +159,7 @@ export function BookingStatusTracker({ booking, onStatusChange }: BookingStatusT
             <div className="flex gap-3">
               <div className="flex flex-col items-center">
                 <div className="w-3 h-3 bg-green-500 rounded-full" />
-                {booking.status !== BookingStatus.CONFIRMED && (
+                {booking.status === BookingStatus.COMPLETED && (
                   <div className="w-0.5 flex-1 bg-slate-200 min-h-[2rem]" />
                 )}
               </div>
@@ -203,30 +168,18 @@ export function BookingStatusTracker({ booking, onStatusChange }: BookingStatusT
                 <p className="text-xs text-slate-500">
                   {booking.status === BookingStatus.CONFIRMED
                     ? "Booking confirmed and ready"
-                    : booking.status === BookingStatus.CHECKED_IN
-                    ? "Guest has checked in"
-                    : "Booking completed"}
+                    : "Booking confirmed and completed"}
                 </p>
               </div>
             </div>
           )}
 
-          {booking.status === BookingStatus.CHECKED_IN && (
+          {booking.status === BookingStatus.COMPLETED && (
             <div className="flex gap-3">
               <div className="w-3 h-3 bg-green-500 rounded-full" />
               <div className="flex-1">
-                <p className="text-sm font-medium text-slate-900">Guest Checked In</p>
-                <p className="text-xs text-slate-500">Guest has arrived</p>
-              </div>
-            </div>
-          )}
-
-          {booking.status === BookingStatus.CHECKED_OUT && (
-            <div className="flex gap-3">
-              <div className="w-3 h-3 bg-green-500 rounded-full" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-slate-900">Guest Checked Out</p>
-                <p className="text-xs text-slate-500">Booking completed</p>
+                <p className="text-sm font-medium text-slate-900">Booking Completed</p>
+                <p className="text-xs text-slate-500">Guest has checked in</p>
               </div>
             </div>
           )}
