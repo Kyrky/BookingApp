@@ -32,6 +32,10 @@ export const bookingApi = {
     return apiClient.get<BookingListResponseDto>(`/api/bookings${query ? `?${query}` : ""}`);
   },
 
+  async getMyBookings(): Promise<BookingListResponseDto> {
+    return apiClient.get<BookingListResponseDto>("/api/bookings/my");
+  },
+
   async getById(id: string): Promise<BookingResponseDto> {
     return apiClient.get<BookingResponseDto>(`/api/bookings/${id}`);
   },

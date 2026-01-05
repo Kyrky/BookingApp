@@ -1,7 +1,9 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
+import net from "net";
 import propertyRoutes from "./modules/property/interfaces/property.routes";
+import bookingRoutes from "./modules/booking/interfaces/booking.routes";
 import { errorHandler } from "./middleware/error.middleware";
 import { logger } from "./shared/middleware/logger.middleware";
 import { cleanupOrphanedImages } from "./utils/cleanup.utils";
@@ -21,7 +23,33 @@ import { BcryptAdapterImpl } from "./shared/infrastructure/bcrypt.adapter.impl";
 import { JwtServiceImpl } from "./shared/infrastructure/jwt.service.impl";
 
 const app = express();
-const PORT = 3001;
+
+// Port fallback configuration: try ports 3001-3010
+function getAvailablePort(startPort: number, endPort: number): number {
+  for (let port = startPort; port <= endPort; port++) {
+    if (isPortAvailable(port)) {
+      return port;
+    }
+  }
+  throw new Error(`No available ports in range ${startPort}-${endPort}`);
+}
+
+function isPortAvailable(port: number): boolean {
+  const server = net.createServer();
+  try {
+    server.listen(port, () => {
+      server.once("close", () => {
+        // Port is available
+      });
+      server.close();
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const PORT = getAvailablePort(3001, 3010);
 
 // Initialize auth dependencies
 const bcryptAdapter = new BcryptAdapterImpl();
@@ -48,17 +76,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/properties", propertyRoutes);
-
-// Bookings placeholder (TODO: implement full booking module)
-app.get("/api/bookings", (req, res) => {
-  res.json({
-    success: true,
-    data: {
-      bookings: [],
-      total: 0,
-    },
-  });
-});
+app.use("/api/bookings", bookingRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
@@ -98,6 +116,15 @@ app.listen(PORT, () => {
   console.log(`  POST   http://localhost:${PORT}/api/properties`);
   console.log(`  PUT    http://localhost:${PORT}/api/properties/:id`);
   console.log(`  DELETE http://localhost:${PORT}/api/properties/:id`);
-  console.log(`  GET    http://localhost:${PORT}/api/bookings (placeholder)`);
+  console.log(`  GET    http://localhost:${PORT}/api/bookings`);
+  console.log(`  GET    http://localhost:${PORT}/api/bookings/my`);
+  console.log(`  GET    http://localhost:${PORT}/api/bookings/:id`);
+  console.log(`  POST   http://localhost:${PORT}/api/bookings`);
+  console.log(`  PUT    http://localhost:${PORT}/api/bookings/:id`);
+  console.log(`  DELETE http://localhost:${PORT}/api/bookings/:id`);
+  console.log(`  POST   http://localhost:${PORT}/api/bookings/:id/cancel`);
+  console.log(`  POST   http://localhost:${PORT}/api/bookings/:id/confirm`);
+  console.log(`  POST   http://localhost:${PORT}/api/bookings/:id/check-in`);
+  console.log(`  POST   http://localhost:${PORT}/api/bookings/:id/check-out`);
   console.log(`  POST   http://localhost:${PORT}/api/cleanup/images`);
 });

@@ -1,8 +1,7 @@
 export enum BookingStatus {
   PENDING = "PENDING",
   CONFIRMED = "CONFIRMED",
-  CHECKED_IN = "CHECKED_IN",
-  CHECKED_OUT = "CHECKED_OUT",
+  COMPLETED = "COMPLETED",
   CANCELLED = "CANCELLED",
 }
 
@@ -16,35 +15,28 @@ export enum PaymentStatus {
 export interface CreateBookingDto {
   propertyId: string;
   userId: string;
-  checkIn: Date;
-  checkOut: Date;
-  guests: number;
+  startDate: Date;
+  endDate: Date;
+  totalGuests: number;
   totalPrice: number;
-  specialRequests?: string;
 }
 
 export interface UpdateBookingDto {
-  checkIn?: Date;
-  checkOut?: Date;
-  guests?: number;
-  specialRequests?: string;
-  status?: BookingStatus;
-  paymentStatus?: PaymentStatus;
+  totalGuests?: number;
 }
 
 export interface BookingResponseDto {
   id: string;
   propertyId: string;
   userId: string;
-  checkIn: Date;
-  checkOut: Date;
-  guests: number;
+  startDate: Date;
+  endDate: Date;
+  totalGuests: number;
   totalPrice: number;
-  specialRequests: string | null;
-  status: BookingStatus;
-  paymentStatus: PaymentStatus;
+  status: string;
   createdAt: Date;
   updatedAt: Date;
+  days?: number;
   property?: {
     id: string;
     title: string;
