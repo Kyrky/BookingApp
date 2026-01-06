@@ -22,6 +22,9 @@ export class Property {
   ) {
     this.validateTitle(title);
     this.validateDescription(description);
+    // Trim values after validation
+    this.title = title.trim();
+    this.description = description.trim();
   }
 
   static create(input: {

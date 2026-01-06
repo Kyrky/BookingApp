@@ -24,32 +24,9 @@ import { JwtServiceImpl } from "./shared/infrastructure/jwt.service.impl";
 
 const app = express();
 
-// Port fallback configuration: try ports 3001-3010
-function getAvailablePort(startPort: number, endPort: number): number {
-  for (let port = startPort; port <= endPort; port++) {
-    if (isPortAvailable(port)) {
-      return port;
-    }
-  }
-  throw new Error(`No available ports in range ${startPort}-${endPort}`);
-}
-
-function isPortAvailable(port: number): boolean {
-  const server = net.createServer();
-  try {
-    server.listen(port, () => {
-      server.once("close", () => {
-        // Port is available
-      });
-      server.close();
-    });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-const PORT = getAvailablePort(3001, 3010);
+// Port fallback configuration: use port 3001 by default
+// Port is allocated via environment variable or falls back to 3001
+const PORT = parseInt(process.env.PORT || '3001', 10);
 
 // Initialize auth dependencies
 const bcryptAdapter = new BcryptAdapterImpl();

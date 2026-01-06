@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Booking } from './booking.entity';
-import { BookingStatus } from './booking-status.enum';
-import { ValueError } from '../errors/value.error';
+import { Booking } from '../booking.entity';
+import { BookingStatus } from '../booking-status.enum';
+import { ValueError } from '../../errors/value.error';
 
 describe('Booking Entity', () => {
   describe('Creation', () => {

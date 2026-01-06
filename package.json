@@ -3,14 +3,15 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --parallel",
+    "dev:test": "turbo run dev test:watch --parallel",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "test": "vitest",
-    "test:watch": "vitest --watch",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
+    "test:coverage": "turbo run test --coverage",
     "test:ci": "vitest --run --coverage --maxWorkers=2"
   },
   "devDependencies": {
