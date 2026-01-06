@@ -20,7 +20,10 @@
       "Bash(npx vitest run:*)",
       "Bash(pnpm -F \"@repo/shared\" build:*)",
       "Bash(cat:*)",
-      "Bash(tasklist:*)"
+      "Bash(tasklist:*)",
+      "Bash(pnpm test)",
+      "Bash(npx vitest --run:*)",
+      "Bash(pnpm turbo run test:*)"
     ]
   }
 }

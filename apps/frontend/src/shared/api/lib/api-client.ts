@@ -179,4 +179,5 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
-export type { ApiResponse, ApiError };
+export { ApiClient, ApiError };
+export type { ApiResponse };
