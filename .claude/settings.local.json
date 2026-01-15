@@ -23,7 +23,12 @@
       "Bash(tasklist:*)",
       "Bash(pnpm test)",
       "Bash(npx vitest --run:*)",
-      "Bash(pnpm turbo run test:*)"
+      "Bash(pnpm turbo run test:*)",
+      "Bash(timeout:*)",
+      "Bash(pnpm vitest:*)",
+      "Bash(pnpm --filter @repo/all-tests exec vitest:*)",
+      "Bash(pnpm add:*)",
+      "Bash(node:*)"
     ]
   }
 }

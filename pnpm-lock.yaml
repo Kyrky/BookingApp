@@ -11,9 +11,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: ^4.0.16
         version: 4.0.16(vitest@4.0.16(@types/node@22.15.3)(@vitest/ui@4.0.16)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.30.2))
-      '@vitest/ui':
-        specifier: ^4.0.16
-        version: 4.0.16(vitest@4.0.16)
       prettier:
         specifier: ^3.7.4
         version: 3.7.4
@@ -166,6 +163,18 @@ importers:
       vitest:
         specifier: ^4.0.16
         version: 4.0.16(@types/node@20.19.27)(@vitest/ui@4.0.16)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.30.2)
+
+  packages/all-tests:
+    devDependencies:
+      '@vitest/coverage-v8':
+        specifier: ^4.0.16
+        version: 4.0.16(vitest@4.0.16(@types/node@22.15.3)(@vitest/ui@4.0.16)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.30.2))
+      '@vitest/ui':
+        specifier: ^4.0.16
+        version: 4.0.16(vitest@4.0.16)
+      vitest:
+        specifier: ^4.0.16
+        version: 4.0.16(@types/node@22.15.3)(@vitest/ui@4.0.16)(jiti@2.6.1)(jsdom@25.0.1)(lightningcss@1.30.2)
 
   packages/database:
     dependencies:

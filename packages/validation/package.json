@@ -14,7 +14,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "test": "vitest",
-    "test:watch": "vitest --watch"
+    "test:watch": "vitest --watch",
+    "test:all": "vitest --watch"
   },
   "dependencies": {
     "@repo/dto": "workspace:*",
