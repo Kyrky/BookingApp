@@ -19,7 +19,10 @@ export default defineConfig({
       'packages/all-tests',
     ],
     passWithNoTests: false,
-    reporters: ['default'],
+    reporters: ['default', 'json'],
+    outputFile: {
+      json: 'packages/all-tests/reports/test-results.json',
+    },
     setupFiles: ['packages/all-tests/src/summary.ts'],
     coverage: {
       provider: 'v8',
