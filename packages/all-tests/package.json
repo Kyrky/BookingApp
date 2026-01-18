@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "node dev.js",
-    "vitest": "vitest",
-    "test": "vitest --watch",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest --watch --coverage",
-    "test:ci": "vitest --run --coverage --maxWorkers=2"
+    "vitest": "cd ../.. && pnpm vitest --filter @repo/all-tests",
+    "test": "node dev.js",
+    "test:ui": "cd ../.. && pnpm vitest --filter @repo/all-tests --ui",
+    "test:coverage": "node dev.js",
+    "test:ci": "cd ../.. && pnpm vitest --filter @repo/all-tests --run --coverage --maxWorkers=2"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.16",
