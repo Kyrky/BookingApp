@@ -9,7 +9,10 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "test": "turbo run test",
-    "test:all": "turbo run test --filter=@repo/all-tests"
+    "test:all": "turbo run test --filter=@repo/all-tests",
+    "test:e2e": "turbo run test --filter=@repo/playwright",
+    "test:e2e:ui": "turbo run test:ui --filter=@repo/playwright",
+    "test:e2e:debug": "turbo run test:debug --filter=@repo/playwright"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.16",

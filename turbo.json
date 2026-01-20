@@ -24,6 +24,14 @@
     "test": {
       "cache": false
     },
+    "test:ui": {
+      "cache": false,
+      "persistent": true
+    },
+    "test:debug": {
+      "cache": false,
+      "persistent": true
+    },
     "test:all": {
       "cache": false,
       "persistent": true

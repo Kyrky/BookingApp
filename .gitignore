@@ -16,6 +16,11 @@ node_modules
 coverage
 **/reports/report-*.html
 
+# Playwright
+playwright-report/
+test-results/
+**/playwright/.cache/
+
 # Turbo
 .turbo
 
