@@ -11,6 +11,8 @@
     "install:browsers": "playwright install --with-deps"
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.1"
+    "@playwright/test": "^1.49.1",
+    "@repo/typescript-config": "workspace:^",
+    "@types/node": "^25.1.0"
   }
 }

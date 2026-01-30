@@ -47,6 +47,7 @@ yarn-error.log*
 BOOKING_SYSTEM_GUIDE.md
 TESTING_TICKETS.md
 docs/daily-report-*.html
+docs/RULES.md
 
 # Next.js lock files (prevents dev server restart issues)
 apps/frontend/.next/dev/lock
@@ -54,3 +55,6 @@ apps/backend/.next/dev/lock
 
 # Temporary files
 nul
+
+# Work Simulator (for footage generation)
+ws/
