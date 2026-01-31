@@ -37,6 +37,10 @@ export function toBookingResponseDto(
   property?: Property | null,
   user?: User | null
 ): BookingResponseDto {
+  if (!booking) {
+    throw new Error("Booking is required for mapping");
+  }
+
   const response: BookingResponseDto = {
     id: booking.id,
     propertyId: booking.propertyId,
@@ -52,20 +56,22 @@ export function toBookingResponseDto(
   };
 
   if (property) {
+    // console.log("Mapping property:", property.title);
     response.property = {
       id: property.id,
-      title: property.title,
-      address: property.address,
-      imageUrl: property.imageUrl,
-      pricePerNight: property.pricePerNight,
+      title: property.title || "Unknown Property",
+      address: property.address || "No Address",
+      imageUrl: property.imageUrl || null,
+      pricePerNight: Number(property.pricePerNight),
     };
   }
 
   if (user) {
+    // console.log("Mapping user:", user.name);
     response.user = {
       id: user.id,
-      name: user.name,
-      email: user.email,
+      name: user.name || "Unknown User",
+      email: user.email || "",
     };
   }
 
@@ -75,6 +81,10 @@ export function toBookingResponseDto(
 export function toBookingListResponseDto(
   bookingsWithRelations: Array<{ booking: Booking; property?: Property | null; user?: User | null }>
 ): BookingListResponseDto {
+  if (!Array.isArray(bookingsWithRelations)) {
+    return { bookings: [], total: 0 };
+  }
+
   return {
     bookings: bookingsWithRelations.map(({ booking, property, user }) =>
       toBookingResponseDto(booking, property, user)

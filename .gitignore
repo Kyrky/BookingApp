@@ -55,6 +55,3 @@ apps/backend/.next/dev/lock
 
 # Temporary files
 nul
-
-# Work Simulator (for footage generation)
-ws/

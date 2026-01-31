@@ -49,11 +49,9 @@ class ApiClient {
       headers,
     };
 
-    console.log(`[API] ${config.method || "GET"} ${url}`);
 
     const response = await fetch(url, config);
 
-    console.log(`[API] Response status: ${response.status}`, response);
 
     // Check if response is OK before parsing
     if (!response.ok) {
@@ -73,7 +71,6 @@ class ApiClient {
     let data: ApiResponse<T>;
     try {
       const text = await response.text();
-      console.log(`[API] Response text:`, text);
       data = JSON.parse(text);
     } catch (e) {
       console.error(`[API] Failed to parse JSON:`, e);

@@ -20,11 +20,7 @@ export class PrismaBookingRepository implements IBookingRepository {
       const booking = await prisma.booking.findUnique({
         where: { id },
       });
-
-      if (!booking) {
-        return null;
-      }
-
+      if (!booking) return null;
       return toDomain(booking);
     } catch (error) {
       console.error(`Error finding booking by id ${id}:`, error);
@@ -92,21 +88,18 @@ export class PrismaBookingRepository implements IBookingRepository {
           id: excludeBookingId ? { not: excludeBookingId } : undefined,
           OR: [
             {
-              // New booking starts during an existing booking
               AND: [
                 { startDate: { lte: startDate } },
                 { endDate: { gt: startDate } },
               ],
             },
             {
-              // New booking ends during an existing booking
               AND: [
                 { startDate: { lt: endDate } },
                 { endDate: { gte: endDate } },
               ],
             },
             {
-              // New booking completely covers an existing booking
               AND: [
                 { startDate: { gte: startDate } },
                 { endDate: { lte: endDate } },
@@ -124,42 +117,26 @@ export class PrismaBookingRepository implements IBookingRepository {
 
   async save(booking: Booking): Promise<Booking> {
     try {
-      const existing = await prisma.booking.findUnique({
+      const data = {
+        id: booking.id,
+        propertyId: booking.propertyId,
+        userId: booking.userId,
+        startDate: booking.startDate,
+        endDate: booking.endDate,
+        totalGuests: booking.totalGuests,
+        totalPrice: booking.totalPrice,
+        status: booking.status,
+        createdAt: booking.createdAt,
+        updatedAt: booking.updatedAt,
+      };
+
+      const result = await prisma.booking.upsert({
         where: { id: booking.id },
+        update: data,
+        create: data,
       });
 
-      if (existing) {
-        const updated = await prisma.booking.update({
-          where: { id: booking.id },
-          data: {
-            propertyId: booking.propertyId,
-            userId: booking.userId,
-            startDate: booking.startDate,
-            endDate: booking.endDate,
-            totalGuests: booking.totalGuests,
-            totalPrice: booking.totalPrice,
-            status: booking.status,
-            updatedAt: booking.updatedAt,
-          },
-        });
-        return toDomain(updated);
-      } else {
-        const created = await prisma.booking.create({
-          data: {
-            id: booking.id,
-            propertyId: booking.propertyId,
-            userId: booking.userId,
-            startDate: booking.startDate,
-            endDate: booking.endDate,
-            totalGuests: booking.totalGuests,
-            totalPrice: booking.totalPrice,
-            status: booking.status,
-            createdAt: booking.createdAt,
-            updatedAt: booking.updatedAt,
-          },
-        });
-        return toDomain(created);
-      }
+      return toDomain(result);
     } catch (error) {
       console.error(`Error saving booking ${booking.id}:`, error);
       throw new Error("Failed to save booking");
@@ -168,67 +145,53 @@ export class PrismaBookingRepository implements IBookingRepository {
 
   async delete(id: string): Promise<void> {
     try {
-      const existing = await prisma.booking.findUnique({
-        where: { id },
-      });
-
-      if (!existing) {
-        throw new BookingNotFoundError(id);
-      }
-
-      await prisma.booking.delete({
-        where: { id },
-      });
+      await prisma.booking.delete({ where: { id } });
     } catch (error) {
-      if (error instanceof BookingNotFoundError) {
-        throw error;
-      }
       console.error(`Error deleting booking ${id}:`, error);
       throw new Error("Failed to delete booking");
     }
   }
 
-  // Additional methods to fetch bookings with relations (property and user)
+  // Methods with Relations
   async findAllWithRelations(): Promise<Array<{ booking: Booking; property: Property | null; user: User | null }>> {
-    try {
-      const bookings = await prisma.booking.findMany({
-        include: {
-          property: true,
-          user: true,
-        },
-        orderBy: { createdAt: "desc" },
-      });
+    const bookings = await prisma.booking.findMany({
+      include: { property: true, user: true },
+      orderBy: { createdAt: "desc" },
+    });
 
-      return bookings.map((b) => ({
-        booking: toDomain(b),
-        property: b.property,
-        user: b.user,
-      }));
-    } catch (error) {
-      console.error("Error finding all bookings with relations:", error);
-      throw new Error("Failed to fetch bookings");
-    }
+    return bookings.map((b) => ({
+      booking: toDomain(b),
+      property: b.property,
+      user: b.user,
+    }));
   }
 
   async findByUserIdWithRelations(userId: string): Promise<Array<{ booking: Booking; property: Property | null; user: User | null }>> {
-    try {
-      const bookings = await prisma.booking.findMany({
-        where: { userId },
-        include: {
-          property: true,
-          user: true,
-        },
-        orderBy: { createdAt: "desc" },
-      });
+    const bookings = await prisma.booking.findMany({
+      where: { userId },
+      include: { property: true, user: true },
+      orderBy: { createdAt: "desc" },
+    });
 
-      return bookings.map((b) => ({
-        booking: toDomain(b),
-        property: b.property,
-        user: b.user,
-      }));
-    } catch (error) {
-      console.error(`Error finding bookings by user ${userId}:`, error);
-      throw new Error("Failed to fetch user bookings");
-    }
+    return bookings.map((b) => ({
+      booking: toDomain(b),
+      property: b.property,
+      user: b.user,
+    }));
+  }
+
+  async findByIdWithRelations(id: string): Promise<{ booking: Booking; property: Property | null; user: User | null } | null> {
+    const b = await prisma.booking.findUnique({
+      where: { id },
+      include: { property: true, user: true },
+    });
+
+    if (!b) return null;
+
+    return {
+      booking: toDomain(b),
+      property: b.property,
+      user: b.user,
+    };
   }
 }

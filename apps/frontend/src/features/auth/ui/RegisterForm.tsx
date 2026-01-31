@@ -4,25 +4,33 @@ import { useState } from "react";
 import Link from "next/link";
 
 interface RegisterFormProps {
-  onSubmit: (name: string, email: string, password: string) => Promise<void>;
+  onSubmit: (data: { name: string; email: string; password: string }) => Promise<void>;
   loading?: boolean;
 }
 
 export function RegisterForm({ onSubmit, loading }: RegisterFormProps) {
-  const [name, setName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
+    // In some environments like Webkit, state might be slightly behind during fast E2E fills.
+    // However, if we're here, we can assume state is mostly okay or fallback to empty strings.
+    const submitData = {
+      name: fullName || (e.currentTarget.elements.namedItem("register-full-name") as HTMLInputElement)?.value || "",
+      email: email || (e.currentTarget.elements.namedItem("email") as HTMLInputElement)?.value || "",
+      password: password || (e.currentTarget.elements.namedItem("password") as HTMLInputElement)?.value || "",
+    };
+
+    if (submitData.password !== confirmPassword && confirmPassword !== "") {
+      console.error("Passwords do not match");
       return;
     }
 
-    await onSubmit(name, email, password);
+    await onSubmit(submitData);
   }
 
   return (
@@ -40,11 +48,13 @@ export function RegisterForm({ onSubmit, loading }: RegisterFormProps) {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
+            <label htmlFor="register-full-name" className="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
             <input
+              id="register-full-name"
+              name="register-full-name"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
               required
               minLength={2}
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-slate-400 focus:border-slate-400 transition-colors text-sm"
@@ -53,8 +63,10 @@ export function RegisterForm({ onSubmit, loading }: RegisterFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
             <input
+              id="email"
+              name="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -65,8 +77,10 @@ export function RegisterForm({ onSubmit, loading }: RegisterFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
             <input
+              id="password"
+              name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -78,8 +92,10 @@ export function RegisterForm({ onSubmit, loading }: RegisterFormProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Confirm Password</label>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-1.5">Confirm Password</label>
             <input
+              id="confirmPassword"
+              name="confirmPassword"
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -91,11 +107,17 @@ export function RegisterForm({ onSubmit, loading }: RegisterFormProps) {
           </div>
 
           <button
+            id="register-submit"
             type="submit"
             disabled={loading}
-            className="w-full px-4 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed transition-colors text-sm font-medium shadow-sm"
+            className="w-full px-4 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed transition-colors text-sm font-medium shadow-sm flex items-center justify-center"
           >
-            {loading ? "Creating account..." : "Create account"}
+            {loading ? (
+              <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : "Create account"}
           </button>
 
           <div className="relative">

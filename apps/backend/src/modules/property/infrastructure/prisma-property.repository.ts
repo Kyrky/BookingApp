@@ -45,6 +45,7 @@ export class PrismaPropertyRepository implements IPropertyRepository {
             address: property.getAddress().toString(),
             pricePerNight: property.getPricePerNight().toNumber(),
             imageUrl: property.getImageUrl(),
+            updatedAt: new Date(),
           },
         });
         return toDomain(updated);
@@ -58,6 +59,8 @@ export class PrismaPropertyRepository implements IPropertyRepository {
             pricePerNight: property.getPricePerNight().toNumber(),
             imageUrl: property.getImageUrl(),
             ownerId: property.ownerId,
+            createdAt: property.createdAt || new Date(),
+            updatedAt: new Date(),
           },
         });
         return toDomain(created);
