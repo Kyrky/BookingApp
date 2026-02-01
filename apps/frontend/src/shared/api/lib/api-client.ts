@@ -59,7 +59,6 @@ class ApiClient {
       let errorMessage = `Request failed with status ${response.status}`;
       try {
         const text = await response.text();
-        console.error(`[API] Error response:`, text);
         errorMessage = text || errorMessage;
       } catch (e) {
         // Ignore text parse errors
