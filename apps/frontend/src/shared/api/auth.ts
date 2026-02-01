@@ -61,23 +61,34 @@ class AuthApi {
 
   async login(data: LoginRequest): Promise<AuthResponse> {
     const url = `${this.baseUrl}/api/auth/login`;
-    console.log("API Login request:", { url, data });
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
-    console.log("API Login response status:", response.status);
 
     if (!response.ok) {
       const error = await response.json();
-      console.error("API Login error:", error);
-      throw new Error(error.error || "Login failed");
+      console.error("API Login error response:", error);
+      let message = error.error || "Login failed";
+
+      const details = [];
+      if (error.details && Array.isArray(error.details)) {
+        details.push(...error.details.map((d: any) => `${d.path.join(".")}: ${d.message}`));
+      }
+      if (error.message) {
+        details.push(error.message);
+      }
+
+      if (details.length > 0) {
+        message += `: ${details.join(", ")}`;
+      }
+
+      throw new Error(message);
     }
 
     const result = await response.json();
-    console.log("API Login success:", result);
     return result.data;
   }
 
@@ -90,7 +101,22 @@ class AuthApi {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Registration failed");
+      console.error("API Register error response:", error);
+      let message = error.error || "Registration failed";
+
+      const details = [];
+      if (error.details && Array.isArray(error.details)) {
+        details.push(...error.details.map((d: any) => `${d.path.join(".")}: ${d.message}`));
+      }
+      if (error.message) {
+        details.push(error.message);
+      }
+
+      if (details.length > 0) {
+        message += `: ${details.join(", ")}`;
+      }
+
+      throw new Error(message);
     }
 
     const result = await response.json();

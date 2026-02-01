@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2E Testing Plan | BookingApp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            background: #ffffff;
+            color: #1a1a1a;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: #fafafa;
+            border-right: 1px solid #e5e5e5;
+            overflow-y: auto;
+            padding: 24px 0;
+        }
+
+        .sidebar-header {
+            padding: 0 24px 16px;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 16px;
+        }
+
+        .sidebar-header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .nav-section {
+            margin-bottom: 24px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #888;
+            padding: 0 24px;
+            margin-bottom: 8px;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 6px 24px;
+            font-size: 14px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.15s ease;
+            border-left: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: #1a1a1a;
+            background: #f5f5f5;
+        }
+
+        .nav-link.active {
+            color: #1a1a1a;
+            border-left-color: #f97316;
+            background: #fff7ed;
+            font-weight: 500;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            min-width: 0;
+        }
+
+        .content-wrapper {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 48px 48px 96px;
+        }
+
+        /* Header */
+        .page-header {
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .page-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 64px;
+            scroll-margin-top: 48px;
+        }
+
+        .section h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            letter-spacing: -0.01em;
+        }
+
+        .section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            margin-top: 28px;
+            color: #1a1a1a;
+        }
+
+        .section h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .section p {
+            margin-bottom: 14px;
+            color: #333;
+            font-size: 15px;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 15px;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .data-table th {
+            font-weight: 500;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            background: #fafafa;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table td {
+            color: #1a1a1a;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-icon {
+            display: inline-flex;
+            width: 16px;
+            height: 16px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-ready { color: #22c55e; }
+        .status-partial { color: #f59e0b; }
+        .status-missing { color: #ef4444; }
+
+        .feature-name {
+            font-weight: 500;
+        }
+
+        .feature-location {
+            font-size: 12px;
+            color: #888;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Courier New', monospace;
+        }
+
+        .feature-comment {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* Steps */
+        .steps {
+            counter-reset: step;
+        }
+
+        .step {
+            counter-increment: step;
+            margin-bottom: 18px;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .step::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 2px;
+            width: 26px;
+            height: 26px;
+            background: #f5f5f5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        /* Code block */
+        .code-block {
+            background: #1a1a1a;
+            color: #e4e4e7;
+            padding: 18px;
+            border-radius: 6px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            line-height: 1.8;
+            margin-bottom: 18px;
+            white-space: pre;
+        }
+
+        .code-block .folder {
+            color: #fbbf24;
+        }
+
+        .code-block .file {
+            color: #60a5fa;
+        }
+
+        .code-block .comment {
+            color: #737373;
+        }
+
+        .code-block .indent {
+            color: #6b7280;
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .badge-ready {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-partial {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-missing {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Priority sections */
+        .priority-section {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 14px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .priority-section h3 {
+            margin-top: 0;
+        }
+
+        /* Command box */
+        .command-box {
+            background: #1a1a1a;
+            color: #e4e4e7;
+            padding: 16px 18px;
+            border-radius: 6px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Courier New', monospace;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .command-box .comment {
+            color: #737373;
+        }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            gap: 32px;
+            margin-top: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .stat-ready .stat-value { color: #22c55e; }
+        .stat-partial .stat-value { color: #f59e0b; }
+        .stat-missing .stat-value { color: #ef4444; }
+
+        /* Footer */
+        footer {
+            margin-top: 80px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e5e5;
+            color: #888;
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .content-wrapper {
+                padding: 32px 24px 64px;
+            }
+
+            .page-header h1 {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .stats {
+                flex-direction: column;
+                gap: 16px;
+            }
+        }
+
+        /* Scrollbar */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #d4d4d8;
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: #a1a1aa;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>E2E Testing Plan</h1>
+        </div>
+
+        <nav>
+            <div class="nav-section">
+                <div class="nav-section-title">Overview</div>
+                <ul class="nav-links">
+                    <li><a href="#status" class="nav-link">Feature Status</a></li>
+                    <li><a href="#priority-1" class="nav-link">Priority 1</a></li>
+                    <li><a href="#priority-2" class="nav-link">Priority 2</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Structure</div>
+                <ul class="nav-links">
+                    <li><a href="#test-structure" class="nav-link">Test Files</a></li>
+                    <li><a href="#navigation" class="nav-link">Navigation</a></li>
+                    <li><a href="#scenarios" class="nav-link">Scenarios</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Setup</div>
+                <ul class="nav-links">
+                    <li><a href="#commands" class="nav-link">Commands</a></li>
+                    <li><a href="#recommendations" class="nav-link">Best Practices</a></li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+            <header class="page-header">
+                <h1>E2E Testing Plan</h1>
+                <p class="subtitle">BookingApp — Comprehensive End-to-End Testing Strategy</p>
+                <div class="stats">
+                    <div class="stat stat-ready">
+                        <div class="stat-value">8</div>
+                        <div class="stat-label">Ready to Test</div>
+                    </div>
+                    <div class="stat stat-partial">
+                        <div class="stat-value">4</div>
+                        <div class="stat-label">Partial/Check</div>
+                    </div>
+                    <div class="stat stat-missing">
+                        <div class="stat-value">4</div>
+                        <div class="stat-label">Not Implemented</div>
+                    </div>
+                </div>
+            </header>
+
+            <section id="status" class="section">
+                <h2>Implemented Features <span class="badge badge-ready">READY</span></h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px"></th>
+                            <th>Feature</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="status-icon status-ready">✓</span></td>
+                            <td><span class="feature-name">Search & Filters</span></td>
+                            <td><span class="feature-location">apps/frontend/src/app/properties/page.tsx</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-ready">✓</span></td>
+                            <td><span class="feature-name">Date Validation</span></td>
+                            <td><span class="feature-location">apps/backend/src/modules/booking/application/create-booking.use-case.ts</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-ready">✓</span></td>
+                            <td><span class="feature-name">Toast Notifications</span></td>
+                            <td><span class="feature-location">apps/frontend/src/shared/ui/</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-ready">✓</span></td>
+                            <td><span class="feature-name">Loading States</span></td>
+                            <td><span class="feature-location">PropertyList, Form components</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-ready">✓</span></td>
+                            <td><span class="feature-name">Role-based Access</span></td>
+                            <td><span class="feature-location">Middleware: requireRole, requireAdmin</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-ready">✓</span></td>
+                            <td><span class="feature-name">Form Validation</span></td>
+                            <td><span class="feature-location">PropertyForm with validation</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-ready">✓</span></td>
+                            <td><span class="feature-name">API Error Handling</span></td>
+                            <td><span class="feature-location">Proper HTTP codes, toast errors</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-ready">✓</span></td>
+                            <td><span class="feature-name">Mobile Responsive</span></td>
+                            <td><span class="feature-location">Tailwind responsive classes</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Partial Implementation <span class="badge badge-partial">CHECK</span></h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px"></th>
+                            <th>Feature</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="status-icon status-partial">○</span></td>
+                            <td><span class="feature-name">Calendar View</span></td>
+                            <td><span class="feature-comment">No UI calendar found, check routes</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-partial">○</span></td>
+                            <td><span class="feature-name">Check-in/Check-out UI</span></td>
+                            <td><span class="feature-comment">API exists, UI buttons need verification</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-partial">○</span></td>
+                            <td><span class="feature-name">Hamburger Menu</span></td>
+                            <td><span class="feature-comment">Nav exists but no mobile burger</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-partial">○</span></td>
+                            <td><span class="feature-name">Page Object Model</span></td>
+                            <td><span class="feature-comment">Basic Playwright setup only</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Not Implemented <span class="badge badge-missing">SKIP</span></h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px"></th>
+                            <th>Feature</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="status-icon status-missing">✗</span></td>
+                            <td><span class="feature-name">Concurrency Tests</span></td>
+                            <td><span class="feature-comment">Race condition testing</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-missing">✗</span></td>
+                            <td><span class="feature-name">Visual Regression</span></td>
+                            <td><span class="feature-comment">Screenshot comparison</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-missing">✗</span></td>
+                            <td><span class="feature-name">Performance Monitoring</span></td>
+                            <td><span class="feature-comment">Load time metrics</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-icon status-missing">✗</span></td>
+                            <td><span class="feature-name">Accessibility Tests</span></td>
+                            <td><span class="feature-comment">a11y automation</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="priority-1" class="section">
+                <h2>Priority 1 — Critical Flows</h2>
+                <div class="priority-section">
+                    <h3>Search & Filter Properties</h3>
+                    <ul>
+                        <li>Text search by title/address</li>
+                        <li>Price range filters (min/max)</li>
+                        <li>Sorting options (date, name, price)</li>
+                        <li>Clear filters button</li>
+                    </ul>
+                </div>
+                <div class="priority-section">
+                    <h3>Booking Date Validation</h3>
+                    <ul>
+                        <li>Overlapping bookings detection</li>
+                        <li>Past dates blocked</li>
+                        <li>Check-out before check-in validation</li>
+                        <li>Proper error messages</li>
+                    </ul>
+                </div>
+                <div class="priority-section">
+                    <h3>Toast Notifications</h3>
+                    <ul>
+                        <li>Success messages</li>
+                        <li>Error notifications</li>
+                        <li>Auto-dismiss after 3 seconds</li>
+                        <li>Manual close button</li>
+                    </ul>
+                </div>
+                <div class="priority-section">
+                    <h3>Role-based Access Control</h3>
+                    <ul>
+                        <li>Admin vs User permissions</li>
+                        <li>Property ownership checks</li>
+                        <li>Protected route redirects</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="priority-2" class="section">
+                <h2>Priority 2 — Negative Scenarios</h2>
+                <div class="priority-section">
+                    <h3>Access Without Authentication</h3>
+                    <ul>
+                        <li>Protected routes redirect to login</li>
+                        <li>API returns 401</li>
+                    </ul>
+                </div>
+                <div class="priority-section">
+                    <h3>Editing Others' Property</h3>
+                    <ul>
+                        <li>Non-owner gets error</li>
+                        <li>Admin can edit any</li>
+                    </ul>
+                </div>
+                <div class="priority-section">
+                    <h3>Invalid Form Data</h3>
+                    <ul>
+                        <li>Required field validation</li>
+                        <li>Format validation (email, numbers)</li>
+                        <li>Visual error indicators</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="test-structure" class="section">
+                <h2>Test Structure</h2>
+                <div class="code-block"><span class="folder">packages/playwright/tests/</span>
+<span class="indent">├──</span> <span class="folder">auth/</span>
+<span class="indent">│   ├──</span> <span class="file">registration.spec.ts</span>
+<span class="indent">│   ├──</span> <span class="file">login.spec.ts</span>
+<span class="indent">│   └──</span> <span class="file">protected-routes.spec.ts</span>
+<span class="indent">├──</span> <span class="folder">properties/</span>
+<span class="indent">│   ├──</span> <span class="file">listing.spec.ts</span>
+<span class="indent">│   ├──</span> <span class="file">creation.spec.ts</span>
+<span class="indent">│   ├──</span> <span class="file">search-filters.spec.ts</span>  <span class="comment"># Priority 1</span>
+<span class="indent">│   └──</span> <span class="file">validation.spec.ts</span>
+<span class="indent">├──</span> <span class="folder">bookings/</span>
+<span class="indent">│   ├──</span> <span class="file">creation.spec.ts</span>
+<span class="indent">│   ├──</span> <span class="file">date-conflicts.spec.ts</span>   <span class="comment"># Priority 1</span>
+<span class="indent">│   ├──</span> <span class="file">status-management.spec.ts</span>
+<span class="indent">│   └──</span> <span class="file">calendar.spec.ts</span>
+<span class="indent">├──</span> <span class="folder">user/</span>
+<span class="indent">│   ├──</span> <span class="file">profile.spec.ts</span>
+<span class="indent">│   └──</span> <span class="file">role-based-access.spec.ts</span>
+<span class="indent">├──</span> <span class="folder">integration/</span>
+<span class="indent">│   └──</span> <span class="file">full-journey.spec.ts</span>
+<span class="indent">└──</span> <span class="folder">negative/</span>
+<span class="indent">    ├──</span> <span class="file">unauthorized-access.spec.ts</span>
+<span class="indent">    └──</span> <span class="file">form-validation.spec.ts</span></div>
+            </section>
+
+            <section id="navigation" class="section">
+                <h2>Navigation Structure</h2>
+                <div class="priority-section">
+                    <h3>Sidebar Layout</h3>
+                    <p>Fixed sidebar navigation on the left side (w-64).</p>
+                    <ul>
+                        <li><strong>Properties</strong> — /properties</li>
+                        <li><strong>Bookings</strong> — /bookings</li>
+                        <li><strong>Settings</strong> — /settings</li>
+                    </ul>
+                </div>
+                <div class="priority-section">
+                    <h3>Playwright Selectors</h3>
+                    <div class="code-block">
+<span class="comment">// Sidebar container</span>
+aside
+
+<span class="comment">// Navigation links</span>
+a[href="/properties"]
+a[href="/bookings"]
+a[href="/settings"]
+
+<span class="comment">// Active state</span>
+.bg-orange-50
+
+<span class="comment">// Auth buttons</span>
+a[href="/auth/login"]
+button:has-text("Sign Out")
+                    </div>
+                </div>
+                <div class="priority-section">
+                    <h3>Route Access</h3>
+                    <p><strong>Public:</strong> /auth/login, /auth/register</p>
+                    <p><strong>Protected:</strong> /properties, /bookings, /settings</p>
+                    <p><strong>Redirect:</strong> / → /properties</p>
+                </div>
+                <div class="priority-section">
+                    <h3>Auth State</h3>
+                    <p><strong>Guest:</strong> "Sign In" link visible</p>
+                    <p><strong>Authenticated:</strong> User profile with name, email, role badge (ADMIN/USER)</p>
+                </div>
+            </section>
+
+            <section id="scenarios" class="section">
+                <h2>Test Scenarios</h2>
+                <div class="steps">
+                    <div class="step">
+                        <strong>Authentication</strong><br>
+                        Register → Login → Access protected pages → Logout
+                    </div>
+                    <div class="step">
+                        <strong>Properties</strong><br>
+                        Browse → Search → Filter → Sort → Create → Edit → Delete
+                    </div>
+                    <div class="step">
+                        <strong>Bookings</strong><br>
+                        Create → Validate dates → Confirm → Cancel → Check-in/out
+                    </div>
+                    <div class="step">
+                        <strong>Admin</strong><br>
+                        View all bookings → Manage any property → Confirm bookings
+                    </div>
+                </div>
+            </section>
+
+            <section id="commands" class="section">
+                <h2>Commands</h2>
+                <div class="command-box"><span class="comment"># Run all e2e tests</span>
+pnpm test:e2e</div>
+                <div class="command-box"><span class="comment"># UI mode with watch</span>
+pnpm test:e2e:ui</div>
+                <div class="command-box"><span class="comment"># Debug mode</span>
+pnpm test:e2e:debug</div>
+            </section>
+
+            <section id="recommendations" class="section">
+                <h2>Technical Recommendations</h2>
+                <h3>Page Object Model (POM)</h3>
+                <p>Create reusable page objects for Auth, Properties, Bookings pages to reduce duplication and improve maintainability.</p>
+                <h3>Test Fixtures</h3>
+                <p>Create shared fixtures for test users (admin, regular user) and test data (properties, bookings).</p>
+                <h3>API Mocking</h3>
+                <p>Consider MSW for faster, more stable tests by mocking API responses.</p>
+            </section>
+
+            <footer>
+                <p>BookingApp E2E Testing Plan • Playwright v1.57.0 • January 2025</p>
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        // Active link highlighting
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.section');
+
+        function updateActiveLink() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveLink);
+        updateActiveLink();
+
+        // Smooth scroll for anchor links
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                const target = document.querySelector(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 interface LoginFormProps {
-  onSubmit: (email: string, password: string) => Promise<void>;
+  onSubmit: (data: { email: string; password: string }) => Promise<void>;
   loading?: boolean;
 }
 
@@ -12,9 +12,16 @@ export function LoginForm({ onSubmit, loading }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    await onSubmit(email, password);
+    const formData = new FormData(e.currentTarget);
+    const formEmail = formData.get("email") as string;
+    const formPassword = formData.get("password") as string;
+
+    const finalEmail = email || formEmail;
+    const finalPassword = password || formPassword;
+
+    await onSubmit({ email: finalEmail, password: finalPassword });
   }
 
   return (
@@ -34,6 +41,8 @@ export function LoginForm({ onSubmit, loading }: LoginFormProps) {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
             <input
+              id="login-email"
+              name="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -46,6 +55,8 @@ export function LoginForm({ onSubmit, loading }: LoginFormProps) {
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
             <input
+              id="login-password"
+              name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -67,6 +78,7 @@ export function LoginForm({ onSubmit, loading }: LoginFormProps) {
           </div>
 
           <button
+            id="login-submit"
             type="submit"
             disabled={loading}
             className="w-full px-4 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:bg-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed transition-colors text-sm font-medium shadow-sm"

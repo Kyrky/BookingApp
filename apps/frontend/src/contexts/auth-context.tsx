@@ -7,8 +7,8 @@ interface AuthContextType {
   user: StoredUser | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  loginAction: (email: string, password: string) => Promise<void>;
-  registerAction: (email: string, password: string, name: string) => Promise<void>;
+  loginAction: (data: { email: string; password: string }) => Promise<void>;
+  registerAction: (data: { name: string; email: string; password: string }) => Promise<void>;
   logout: () => void;
   loading: boolean;
 }
@@ -42,20 +42,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const loginAction = async (email: string, password: string) => {
-    const response = await authApi.login({ email, password });
+  const loginAction = async (data: { email: string; password: string }) => {
+    const response = await authApi.login(data);
     setUser(response.user);
     authStorage.setToken(response.token);
     authStorage.setRefreshToken(response.refreshToken);
     authStorage.setUser(response.user);
   };
 
-  const registerAction = async (email: string, password: string, name: string) => {
-    const response = await authApi.register({ name, email, password });
-    setUser(response.user);
-    authStorage.setToken(response.token);
-    authStorage.setRefreshToken(response.refreshToken);
-    authStorage.setUser(response.user);
+  const registerAction = async (data: { name: string; email: string; password: string }) => {
+    const response = await authApi.register(data);
+
+    if (response) {
+      setUser(response.user);
+      authStorage.setToken(response.token);
+      authStorage.setRefreshToken(response.refreshToken);
+      authStorage.setUser(response.user);
+    }
   };
 
   const logout = () => {

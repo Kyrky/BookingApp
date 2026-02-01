@@ -1,0 +1,18 @@
+{
+  "name": "@repo/all-tests",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node dev.js",
+    "vitest": "cd ../.. && pnpm vitest --filter @repo/all-tests",
+    "test": "node dev.js",
+    "test:ui": "cd ../.. && pnpm vitest --filter @repo/all-tests --ui",
+    "test:coverage": "node dev.js",
+    "test:ci": "cd ../.. && pnpm vitest --filter @repo/all-tests --run --coverage --maxWorkers=2"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.16",
+    "@vitest/ui": "^4.0.16",
+    "vitest": "^4.0.16"
+  }
+}

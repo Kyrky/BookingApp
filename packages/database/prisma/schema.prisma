@@ -6,77 +6,114 @@ datasource db {
   provider = "mysql"
 }
 
-enum UserRole {
-  USER
-  ADMIN
+model Booking {
+  id          String         @id @default(uuid())
+  startDate   DateTime
+  endDate     DateTime
+  totalPrice  Decimal        @db.Decimal(10, 2)
+  userId      String
+  propertyId  String
+  createdAt   DateTime       @default(now())
+  totalGuests Int            @default(1)
+  status      booking_status @default(PENDING)
+  updatedAt   DateTime       @updatedAt
+  property    Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade, map: "Booking_propertyId_fkey")
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Booking_userId_fkey")
+
+  @@index([propertyId], map: "Booking_propertyId_idx")
+  @@index([status], map: "Booking_status_idx")
+  @@index([userId], map: "Booking_userId_idx")
+  @@map("booking")
 }
 
-enum BookingStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-  COMPLETED
-}
+model Log {
+  id        String     @id @default(uuid())
+  timestamp DateTime   @default(now())
+  level     log_level
+  source    log_source
+  message   String     @db.Text
+  metadata  Json?
+  userId    String?
+  requestId String?    @unique(map: "Log_requestId_key")
 
-model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  password     String
-  name         String
-  role         UserRole      @default(USER)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-
-  properties   Property[]
-  bookings     Booking[]
-  refreshTokens RefreshToken[]
+  @@index([level], map: "Log_level_idx")
+  @@index([requestId], map: "Log_requestId_idx")
+  @@index([source], map: "Log_source_idx")
+  @@index([timestamp], map: "Log_timestamp_idx")
+  @@index([timestamp, level], map: "Log_timestamp_level_idx")
+  @@index([timestamp, source], map: "Log_timestamp_source_idx")
+  @@index([userId], map: "Log_userId_idx")
+  @@map("log")
 }
 
 model Property {
-  id          String          @id @default(uuid())
-  title       String
-  description String          @db.Text
+  id            String    @id @default(uuid())
+  title         String
+  description   String    @db.Text
   pricePerNight Float
-  address     String
-  imageUrl    String?
-  ownerId     String
-  owner       User            @relation(fields: [ownerId], references: [id], onDelete: Restrict)
-  bookings    Booking[]
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  address       String
+  imageUrl      String?
+  ownerId       String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  booking       Booking[]
+  user          User      @relation(fields: [ownerId], references: [id], map: "Property_ownerId_fkey")
 
-  @@index([ownerId])
-}
-
-model Booking {
-  id          String        @id @default(uuid())
-  propertyId  String
-  userId      String
-  startDate   DateTime
-  endDate     DateTime
-  totalGuests Int           @default(1)
-  totalPrice  Decimal       @db.Decimal(10, 2)
-  status      BookingStatus @default(PENDING)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([propertyId])
-  @@index([userId])
-  @@index([status])
+  @@index([ownerId], map: "Property_ownerId_idx")
+  @@map("property")
 }
 
 model RefreshToken {
   id        String   @id @default(uuid())
-  token     String   @unique
+  token     String   @unique(map: "RefreshToken_token_key")
   userId    String
   expiresAt DateTime
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "RefreshToken_userId_fkey")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([token], map: "RefreshToken_token_idx")
+  @@index([userId], map: "RefreshToken_userId_idx")
+  @@map("refreshtoken")
+}
 
-  @@index([token])
-  @@index([userId])
+model User {
+  id           String         @id @default(uuid())
+  email        String         @unique(map: "User_email_key")
+  name         String
+  password     String
+  createdAt    DateTime       @default(now())
+  role         user_role      @default(USER)
+  updatedAt    DateTime       @updatedAt
+  booking      Booking[]
+  property     Property[]
+  refreshtoken RefreshToken[]
+
+  @@map("user")
+}
+
+enum log_level {
+  ERROR
+  WARN
+  INFO
+  HTTP
+  DEBUG
+}
+
+enum log_source {
+  BACKEND_HTTP
+  BACKEND_APP
+  VITEST
+  FRONTEND
+}
+
+enum user_role {
+  USER
+  ADMIN
+}
+
+enum booking_status {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
 }

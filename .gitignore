@@ -14,6 +14,12 @@ node_modules
 
 # Testing
 coverage
+**/reports/report-*.html
+
+# Playwright
+playwright-report/
+test-results/
+**/playwright/.cache/
 
 # Turbo
 .turbo
@@ -32,6 +38,7 @@ dist
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
 
 # Misc
 .DS_Store
@@ -40,6 +47,8 @@ yarn-error.log*
 # Documentation
 BOOKING_SYSTEM_GUIDE.md
 TESTING_TICKETS.md
+docs/daily-report-*.html
+docs/RULES.md
 
 # Next.js lock files (prevents dev server restart issues)
 apps/frontend/.next/dev/lock

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Report - {{timestamp}}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Google Sans Flex", 'Aptos Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      font-optical-sizing: auto;
+      line-height: 1.6;
+      background: #f8f9fa;
+      color: #212529;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+    }
+
+    .header h1 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #ffffff;
+    }
+
+    .header .timestamp {
+      font-size: 0.875rem;
+      opacity: 0.9;
+      color: #e0e7ff;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      background: #ffffff;
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid #dee2e6;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .tab {
+      padding: 10px 18px;
+      background: transparent;
+      border: none;
+      color: #6c757d;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .tab:hover {
+      background: #f8f9fa;
+      color: #495057;
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #ffffff;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card {
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .summary-card .icon {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .summary-card .label {
+      font-size: 0.7rem;
+      color: #6c757d;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+    }
+
+    .summary-card .value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #212529;
+    }
+
+    .summary-card.success .value {
+      color: #10b981;
+    }
+
+    .summary-card.coverage .value {
+      color: #f59e0b;
+    }
+
+    .section {
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .section h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #343a40;
+      border-bottom: 1px solid #e9ecef;
+      padding-bottom: 12px;
+    }
+
+    /* Coverage Table */
+    .coverage-table-container {
+      overflow-x: auto;
+    }
+
+    .coverage-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      font-family: 'Consolas', 'Monaco', monospace;
+    }
+
+    .coverage-table th,
+    .coverage-table td {
+      padding: 10px 12px;
+      text-align: left;
+      border: 1px solid #dee2e6;
+    }
+
+    .coverage-table th {
+      background: #f8f9fa;
+      color: #495057;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.05em;
+      position: sticky;
+      top: 0;
+    }
+
+    .coverage-table tr:hover {
+      background: #f8f9fa;
+    }
+
+    .coverage-table tr:nth-child(even) {
+      background: #fafbfc;
+    }
+
+    .coverage-table tr:nth-child(even):hover {
+      background: #f8f9fa;
+    }
+
+    .coverage-table .file-cell {
+      max-width: 350px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .coverage-table .metric-cell {
+      text-align: center;
+    }
+
+    .cell-high {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    .cell-medium {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      font-weight: 600;
+    }
+
+    .cell-low {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      font-weight: 600;
+    }
+
+    .cell-empty {
+      color: #adb5bd;
+    }
+
+    /* Tests List */
+    .test-file {
+      background: #ffffff;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+
+    .test-file-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s ease;
+    }
+
+    .test-file-header:hover {
+      background: #f8f9fa;
+    }
+
+    .test-file-name {
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.8rem;
+      color: #495057;
+      flex: 1;
+    }
+
+    .test-count-badge {
+      background: #10b981;
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .test-list {
+      display: none;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .test-list.show {
+      display: block;
+    }
+
+    .test-case {
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.75rem;
+      color: #6c757d;
+      padding: 8px 16px 8px 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #f1f3f5;
+    }
+
+    .test-case:last-child {
+      border-bottom: none;
+    }
+
+    .test-status {
+      flex-shrink: 0;
+      font-size: 0.8rem;
+    }
+
+    .test-status.passed {
+      color: #10b981;
+    }
+
+    .test-status.failed {
+      color: #ef4444;
+    }
+
+    .test-status.skipped {
+      color: #f59e0b;
+    }
+
+    .test-status.todo {
+      color: #adb5bd;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 10px 14px;
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      color: #212529;
+      font-size: 0.875rem;
+      margin-bottom: 16px;
+      font-family: inherit;
+      transition: border-color 0.15s ease;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-box::placeholder {
+      color: #adb5bd;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #adb5bd;
+      font-size: 0.8rem;
+    }
+
+    .toggle-icon {
+      font-size: 0.7rem;
+      color: #adb5bd;
+      transition: transform 0.2s;
+      margin-left: 12px;
+    }
+
+    .expanded .toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      border: none;
+      padding: 0;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .expand-all-btn {
+      padding: 8px 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 4px;
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(102, 126, 234, 0.3);
+    }
+
+    .expand-all-btn:hover {
+      box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .expand-all-btn:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      .summary {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      body {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Test Report</h1>
+      <div class="timestamp">{{timestamp}}</div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('overview')">Overview</button>
+      <button class="tab" onclick="switchTab('coverage')">Coverage</button>
+      <button class="tab" onclick="switchTab('tests')">Tests</button>
+    </div>
+
+    <!-- Overview Tab -->
+    <div id="tab-overview" class="tab-content active">
+      <div class="summary">
+        <div class="summary-card success">
+          <div class="icon">Test Files</div>
+          <div class="label"></div>
+          <div class="value">{{fileCount}}</div>
+        </div>
+
+        <div class="summary-card success">
+          <div class="icon">Tests</div>
+          <div class="label"></div>
+          <div class="value">{{testCount}}</div>
+        </div>
+
+        <div class="summary-card coverage">
+          <div class="icon">Coverage</div>
+          <div class="label"></div>
+          <div class="value">{{coveragePercent}}%</div>
+        </div>
+
+        <div class="summary-card">
+          <div class="icon">Duration</div>
+          <div class="label"></div>
+          <div class="value">{{duration}}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coverage Tab -->
+    <div id="tab-coverage" class="tab-content">
+      <input type="text" class="search-box" placeholder="Search files..." id="coverage-search" oninput="filterCoverage()">
+      <div class="section">
+        <h2>Coverage Details ({{coverageFileCount}} files)</h2>
+        <div class="coverage-table-container">
+          <table class="coverage-table">
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Stmts</th>
+                <th>Branch</th>
+                <th>Funcs</th>
+                <th>Lines</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{coverageTableRows}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tests Tab -->
+    <div id="tab-tests" class="tab-content">
+      <input type="text" class="search-box" placeholder="Search tests..." id="tests-search" oninput="filterTests()">
+      <div class="section">
+        <div class="section-header">
+          <h2>All Tests ({{testFileCount}} files)</h2>
+          <div class="button-group">
+            <button class="expand-all-btn" onclick="expandAllTests()">Expand All</button>
+            <button class="expand-all-btn" onclick="collapseAllTests()">Collapse All</button>
+          </div>
+        </div>
+        {{testsList}}
+      </div>
+    </div>
+
+    <div class="footer">
+      Generated by @repo/all-tests • BookingApp Project
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.getElementById('tab-' + tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function toggleTests(element) {
+      element.classList.toggle('expanded');
+      const list = element.nextElementSibling;
+      if (list) {
+        list.classList.toggle('show');
+      }
+    }
+
+    function expandAllTests() {
+      const headers = document.querySelectorAll('.test-file-header');
+      headers.forEach(header => {
+        header.classList.add('expanded');
+        const list = header.nextElementSibling;
+        if (list) list.classList.add('show');
+      });
+    }
+
+    function collapseAllTests() {
+      const headers = document.querySelectorAll('.test-file-header');
+      headers.forEach(header => {
+        header.classList.remove('expanded');
+        const list = header.nextElementSibling;
+        if (list) list.classList.remove('show');
+      });
+    }
+
+    function filterCoverage() {
+      const search = document.getElementById('coverage-search').value.toLowerCase();
+      document.querySelectorAll('.coverage-table tbody tr').forEach(row => {
+        const fileName = row.querySelector('.file-cell').textContent.toLowerCase();
+        row.style.display = fileName.includes(search) ? '' : 'none';
+      });
+    }
+
+    function filterTests() {
+      const search = document.getElementById('tests-search').value.toLowerCase();
+      document.querySelectorAll('.test-file').forEach(item => {
+        const name = item.querySelector('.test-file-name').textContent.toLowerCase();
+        item.style.display = name.includes(search) ? '' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

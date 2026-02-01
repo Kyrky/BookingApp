@@ -12,13 +12,17 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:all": "vitest --watch"
   },
   "dependencies": {
     "@repo/typescript-config": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "vitest": "^4.0.16"
   }
 }

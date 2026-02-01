@@ -53,8 +53,8 @@ export default function BookingsPage() {
   async function handleCreate(data: CreateBookingDto) {
     try {
       setSubmitting(true);
-      const newBooking = await bookingApi.create(data);
-      setBookings([...bookings, newBooking]);
+      await bookingApi.create(data);
+      await loadBookings();
       setModalType(null);
       setEditingBooking(null);
       success("Booking created successfully");
@@ -195,11 +195,10 @@ export default function BookingsPage() {
           <div className="flex border-b border-slate-200">
             <button
               onClick={() => setActiveTab("list")}
-              className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
-                activeTab === "list"
-                  ? "text-orange-600 border-b-2 border-orange-600 bg-orange-50"
-                  : "text-slate-600 hover:bg-slate-50"
-              }`}
+              className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${activeTab === "list"
+                ? "text-orange-600 border-b-2 border-orange-600 bg-orange-50"
+                : "text-slate-600 hover:bg-slate-50"
+                }`}
             >
               <div className="flex items-center justify-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -210,11 +209,10 @@ export default function BookingsPage() {
             </button>
             <button
               onClick={() => setActiveTab("payment")}
-              className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
-                activeTab === "payment"
-                  ? "text-orange-600 border-b-2 border-orange-600 bg-orange-50"
-                  : "text-slate-600 hover:bg-slate-50"
-              }`}
+              className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${activeTab === "payment"
+                ? "text-orange-600 border-b-2 border-orange-600 bg-orange-50"
+                : "text-slate-600 hover:bg-slate-50"
+                }`}
             >
               <div className="flex items-center justify-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,11 +223,10 @@ export default function BookingsPage() {
             </button>
             <button
               onClick={() => setActiveTab("calendar")}
-              className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
-                activeTab === "calendar"
-                  ? "text-orange-600 border-b-2 border-orange-600 bg-orange-50"
-                  : "text-slate-600 hover:bg-slate-50"
-              }`}
+              className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${activeTab === "calendar"
+                ? "text-orange-600 border-b-2 border-orange-600 bg-orange-50"
+                : "text-slate-600 hover:bg-slate-50"
+                }`}
             >
               <div className="flex items-center justify-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -240,11 +237,10 @@ export default function BookingsPage() {
             </button>
             <button
               onClick={() => setActiveTab("status")}
-              className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
-                activeTab === "status"
-                  ? "text-orange-600 border-b-2 border-orange-600 bg-orange-50"
-                  : "text-slate-600 hover:bg-slate-50"
-              }`}
+              className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${activeTab === "status"
+                ? "text-orange-600 border-b-2 border-orange-600 bg-orange-50"
+                : "text-slate-600 hover:bg-slate-50"
+                }`}
             >
               <div className="flex items-center justify-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -287,8 +283,8 @@ export default function BookingsPage() {
             <div className="lg:col-span-2">
               <BookingCalendar
                 availability={availability}
-                onDateSelect={(date) => console.log("Selected date:", date)}
-                onMonthChange={(date) => console.log("Month changed:", date)}
+                onDateSelect={() => { }}
+                onMonthChange={() => { }}
               />
             </div>
             <div>

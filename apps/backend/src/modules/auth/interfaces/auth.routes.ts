@@ -10,9 +10,9 @@ const jwtService = new JwtServiceImpl();
 export function makeAuthRoutes(controller: AuthController): Router {
   const router = Router();
 
-  router.post("/register", validate(registerSchema), (req, res) => controller.register(req, res));
-  router.post("/login", validate(loginSchema), (req, res) => controller.login(req, res));
-  router.post("/refresh", validate(refreshSchema), (req, res) => controller.refresh(req, res));
+  router.post("/register", validate(registerSchema, "body"), (req, res) => controller.register(req, res));
+  router.post("/login", validate(loginSchema, "body"), (req, res) => controller.login(req, res));
+  router.post("/refresh", validate(refreshSchema, "body"), (req, res) => controller.refresh(req, res));
 
   // Get current user - requires authentication
   router.get("/me", authMiddleware(jwtService), (req, res) => controller.getMe(req, res));
