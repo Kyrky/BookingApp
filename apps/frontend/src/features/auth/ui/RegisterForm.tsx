@@ -17,12 +17,11 @@ export function RegisterForm({ onSubmit, loading }: RegisterFormProps) {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // In some environments like Webkit, state might be slightly behind during fast E2E fills.
-    // However, if we're here, we can assume state is mostly okay or fallback to empty strings.
+    const formData = new FormData(e.currentTarget);
     const submitData = {
-      name: fullName || (e.currentTarget.elements.namedItem("register-full-name") as HTMLInputElement)?.value || "",
-      email: email || (e.currentTarget.elements.namedItem("email") as HTMLInputElement)?.value || "",
-      password: password || (e.currentTarget.elements.namedItem("password") as HTMLInputElement)?.value || "",
+      name: fullName || (formData.get("name") as string) || "",
+      email: email || (formData.get("email") as string) || "",
+      password: password || (formData.get("password") as string) || "",
     };
 
     if (submitData.password !== confirmPassword && confirmPassword !== "") {
@@ -51,7 +50,7 @@ export function RegisterForm({ onSubmit, loading }: RegisterFormProps) {
             <label htmlFor="register-full-name" className="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
             <input
               id="register-full-name"
-              name="register-full-name"
+              name="name"
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
@@ -63,9 +62,9 @@ export function RegisterForm({ onSubmit, loading }: RegisterFormProps) {
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+            <label htmlFor="register-email" className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
             <input
-              id="email"
+              id="register-email"
               name="email"
               type="email"
               value={email}
@@ -77,9 +76,9 @@ export function RegisterForm({ onSubmit, loading }: RegisterFormProps) {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
+            <label htmlFor="register-password" className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
             <input
-              id="password"
+              id="register-password"
               name="password"
               type="password"
               value={password}
@@ -92,9 +91,9 @@ export function RegisterForm({ onSubmit, loading }: RegisterFormProps) {
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-1.5">Confirm Password</label>
+            <label htmlFor="register-confirm-password" className="block text-sm font-medium text-slate-700 mb-1.5">Confirm Password</label>
             <input
-              id="confirmPassword"
+              id="register-confirm-password"
               name="confirmPassword"
               type="password"
               value={confirmPassword}

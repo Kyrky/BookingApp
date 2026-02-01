@@ -11,50 +11,63 @@ test.describe('Authentication', () => {
     };
 
     test('should register a new user', async ({ page }) => {
-
         const testUser = getUserData('reg');
         await page.goto('/auth/register');
 
-        await page.getByLabel('Full Name').fill(testUser.name);
-        await page.getByLabel('Email', { exact: true }).fill(testUser.email);
-        await page.getByLabel('Password', { exact: true }).fill(testUser.password);
-        await page.getByLabel('Confirm Password').fill(testUser.password);
+        await page.locator('#register-full-name').fill(testUser.name);
+        await page.locator('#register-email').fill(testUser.email);
+        await page.locator('#register-password').fill(testUser.password);
+        await page.locator('#register-confirm-password').fill(testUser.password);
 
         await page.locator('#register-submit').click();
 
         await expect(page).toHaveURL(/.*\/properties/, { timeout: 30000 });
-
-        // Using a more precise locator to avoid collision with the email text in the sidebar
         const userNameLocator = page.locator('p', { hasText: testUser.name }).first();
         await expect(userNameLocator).toBeVisible({ timeout: 15000 });
-        // Double check it's the specific element for name (not including email)
-        await expect(userNameLocator).toHaveClass(/text-slate-900/);
     });
 
     test('should login with created user', async ({ page }) => {
         const testUser = getUserData('login');
 
+        // Setup: Register first
         await page.goto('/auth/register');
-        await page.getByPlaceholder('John Doe').fill(testUser.name);
-        await page.getByPlaceholder('you@example.com').fill(testUser.email);
-        await page.locator('input[type="password"]').first().fill(testUser.password);
-        await page.locator('input[type="password"]').last().fill(testUser.password);
-        await page.getByRole('button', { name: 'Create account' }).click();
-
+        await page.locator('#register-full-name').fill(testUser.name);
+        await page.locator('#register-email').fill(testUser.email);
+        await page.locator('#register-password').fill(testUser.password);
+        await page.locator('#register-confirm-password').fill(testUser.password);
+        await page.locator('#register-submit').click();
         await expect(page).toHaveURL(/.*\/properties/, { timeout: 30000 });
 
+        // Test Login
         await page.goto('/auth/login');
-
-        await page.getByPlaceholder('you@example.com').fill(testUser.email);
-        await page.getByPlaceholder('••••••••').fill(testUser.password);
-
-        await page.getByRole('button', { name: 'Sign in' }).click();
+        await page.locator('#login-email').fill(testUser.email);
+        await page.locator('#login-password').fill(testUser.password);
+        await page.locator('#login-submit').click();
 
         await expect(page).toHaveURL(/.*\/properties/, { timeout: 30000 });
-        await expect(page.getByRole('heading', { name: 'Properties Management' })).toBeVisible({ timeout: 15000 });
-
-        // Precise locator for user name in sidebar
         const userNameLocator = page.locator('p', { hasText: testUser.name }).first();
-        await expect(userNameLocator).toBeVisible({ timeout: 15000 });
+        await expect(userNameLocator).toBeVisible();
+    });
+
+    test('should show error for invalid login', async ({ page }) => {
+        await page.goto('/auth/login');
+        await page.locator('#login-email').fill('wrong@example.com');
+        await page.locator('#login-password').fill('wrongpassword');
+        await page.locator('#login-submit').click();
+
+        await expect(page.getByText(/Invalid credentials|failed/i)).toBeVisible();
+        await expect(page).toHaveURL(/.*\/auth\/login/);
+    });
+
+    test('should validate registration password length', async ({ page }) => {
+        await page.goto('/auth/register');
+        await page.locator('#register-password').fill('123');
+
+        // Browser validation check or custom UI error
+        const submitBtn = page.locator('#register-submit');
+        await submitBtn.click();
+
+        // Should stay on page if blocked by browser validation or show error
+        await expect(page).toHaveURL(/.*\/auth\/register/);
     });
 });

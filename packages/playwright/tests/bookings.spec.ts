@@ -18,10 +18,10 @@ test.describe('Bookings Management', () => {
 
         // Register
         await page.goto('/auth/register');
-        await page.getByLabel('Full Name').fill('Booking Tester');
-        await page.getByLabel('Email', { exact: true }).fill(testData.userEmail);
-        await page.getByLabel('Password', { exact: true }).fill('password123');
-        await page.getByLabel('Confirm Password').fill('password123');
+        await page.locator('#register-full-name').fill('Booking Tester');
+        await page.locator('#register-email').fill(testData.userEmail);
+        await page.locator('#register-password').fill('password123');
+        await page.locator('#register-confirm-password').fill('password123');
         await page.locator('#register-submit').click();
 
         await expect(page).toHaveURL(/.*\/properties/, { timeout: 30000 });
@@ -41,7 +41,6 @@ test.describe('Bookings Management', () => {
         await expect(page.getByRole('heading', { name: 'Bookings Management' })).toBeVisible();
         await page.getByRole('button', { name: 'Create Booking' }).click();
 
-        // Wait for our specific property
         const select = page.locator('select#property');
         let propertyValue: string | null = null;
         await expect(async () => {
@@ -61,25 +60,29 @@ test.describe('Bookings Management', () => {
         await page.locator('#startDate').fill(startDate);
         await page.locator('#endDate').fill(endDate);
 
-        // Click create
         await page.locator('form').getByRole('button', { name: 'Create Booking' }).click();
 
-        // Wait for success toast with long timeout
         await expect(page.getByText('Booking created successfully')).toBeVisible({ timeout: 30000 });
 
-        // Ensure the list is updated
-        // We look for a row that HAS the property title and NOT the "N/A" text
         const bookingRow = page.locator('tr').filter({ hasText: testData.propertyTitle });
-
-        // Wait specifically for the row to be visible and have the property title
         await expect(bookingRow).toBeVisible({ timeout: 20000 });
-
-        // Verify other details in the row
         await expect(bookingRow.getByText(/Pending/i)).toBeVisible();
 
-        // Final sanity check - if there is an "N/A" in the first cell, fail with clear message
         const firstCell = bookingRow.locator('td').first();
         const firstCellText = await firstCell.innerText();
         expect(firstCellText).not.toBe('N/A');
+    });
+
+    test('should validate date range when creating booking', async ({ page }) => {
+        await page.goto('/bookings');
+        await page.getByRole('button', { name: 'Create Booking' }).click();
+
+        // Fill end date EARLIER than start date
+        await page.locator('#startDate').fill('2025-10-10');
+        await page.locator('#endDate').fill('2025-10-01');
+
+        // The button should be disabled for invalid date ranges
+        const submitBtn = page.locator('form').getByRole('button', { name: 'Create Booking' });
+        await expect(submitBtn).toBeDisabled();
     });
 });

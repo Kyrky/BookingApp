@@ -18,7 +18,9 @@ export default function LoginPage() {
     try {
       await loginAction(data);
       success("Login successful");
-      setTimeout(() => router.push("/properties"), 500);
+      setTimeout(() => {
+        window.location.href = "/properties";
+      }, 500);
     } catch (err) {
       console.error("Login error:", err);
       const message = err instanceof Error ? err.message : "Login failed";
